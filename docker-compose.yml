@@ -1,0 +1,6 @@
+version: '2'
+services: 
+  dota2_bot: 
+    build: .
+    ports: 
+      - "8080:8080"

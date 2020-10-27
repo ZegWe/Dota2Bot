@@ -1,0 +1,11 @@
+{
+	"api_key": "xxxxx",
+	"bot_qq": 1234567890,
+	"qq_group_id": 1234567890,
+	"mirai_url": "http://127.0.0.1:8080",
+	"mirai_auth_key": "xxxxxxxxxx",
+	"is_update_DOTA2": true,
+	"player_list": [
+		["圣果皇", 280353932]
+	] 
+}
