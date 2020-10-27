@@ -8,32 +8,35 @@
 
 Download [MiraiOK](https://github.com/LXY1226/MiraiOK).
 
-Run `MiraiOK` once and close, there would be a `plugins` flolder.
+Run `MiraiOK` once and close it, there would be a `plugins` flolder.
 
-move the jar file in [mirai-http-api](https://github.com/project-mirai/mirai-api-http) release int the plugins folder.
+move the `jar` file in [mirai-http-api](https://github.com/project-mirai/mirai-api-http) release into the `plugins` folder.
 
-Run `MiraiOK` with `screen` and sgin in with your QQ account
+Run `MiraiOK` with `screen` and sgin in with your QQ account.
 ```bash
 screen -S bot && ./miraiOK_linux-amd64
 ```
 
+Use `Ctrl+a + d` to go back.
+
+(use `screen -x bot` if you want to re-enter MiraiOK command-line.)
+
+Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+
 ### Install
-
-Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/)
-
-Download this Repo
+Download this Repo.
 ```bash
 git clone https://github.com/ZegWe/Dota2Bot.git
 ```
 
-Edit configuration file
+Create and edit configuration file.
 ```bash
 cd Dota2Bot
 cp config.example.json config.json
 vim config.json
 ```
 
-Run with docker-compose
+Run with docker-compose.
 ```bash
 docker-compose up -d
 ```
