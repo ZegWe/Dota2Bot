@@ -5,6 +5,13 @@ from player import player, PLAYER_LIST
 conn = sqlite3.connect('playerInfo')
 c = conn.cursor()
 
+c.execute('''CREATE TABLE IF NOT EXISTS playerInfo
+(short_steamID INT PRIMARY KEY NOT NULL,
+long_steamID INT NOT NULL,
+nickname CHAR(50) NOT NULL,
+qqid INT NOT NULL,
+last_DOTA2_match_ID INT);
+''')
 
 def init():
     cursor = c.execute("SELECT * from playerInfo")
@@ -12,6 +19,7 @@ def init():
         player_obj = player(short_steamID=row[0],
                             long_steamID=row[1],
                             nickname=row[2],
+							qqid=row[3],
                             last_DOTA2_match_ID=row[4])
         player_obj.DOTA2_score = row[4]
         PLAYER_LIST.append(player_obj)
@@ -23,10 +31,10 @@ def update_DOTA2_match_ID(short_steamID, last_DOTA2_match_ID):
     conn.commit()
 
 
-def insert_info(short_steamID, long_steamID, nickname, last_DOTA2_match_ID):
-    c.execute("INSERT INTO playerInfo (short_steamID, long_steamID, nickname, last_DOTA2_match_ID) "
-              "VALUES ({}, {}, '{}', '{}')"
-              .format(short_steamID, long_steamID, nickname, last_DOTA2_match_ID))
+def insert_info(short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID):
+    c.execute("INSERT INTO playerInfo (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
+              "VALUES ({}, {}, {}, '{}', '{}')"
+              .format(short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
     conn.commit()
 
 

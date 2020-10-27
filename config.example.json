@@ -6,6 +6,6 @@
 	"mirai_auth_key": "xxxxxxxxxx",
 	"is_update_DOTA2": true,
 	"player_list": [
-		["圣果皇", 280353932]
+		["圣果皇", 280353932, 1234567890]
 	] 
 }

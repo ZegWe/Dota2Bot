@@ -29,7 +29,8 @@ def init():
 	for i in player_list:
 		nickname = i[0]
 		short_steamID = i[1]
-		print("{}信息读取完毕, ID:{}".format(nickname, short_steamID))
+		qqid = i[2]
+		print("{}信息读取完毕, ID:{}, qq:{}".format(nickname, short_steamID, qqid))
 		long_steamID = steam_id_convert_32_to_64(short_steamID)
 
 		try:
@@ -40,13 +41,14 @@ def init():
 		# 如果数据库中没有这个人的信息, 则进行数据库插入
 		if not is_player_stored(short_steamID):
 			# 插入数据库
-			insert_info(short_steamID, long_steamID, nickname, last_DOTA2_match_ID)
+			insert_info(short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID)
 		# 如果有这个人的信息则更新其最新的比赛信息
 		else:
 			update_DOTA2_match_ID(short_steamID, last_DOTA2_match_ID)
 		# 新建一个玩家对象, 放入玩家列表
 		temp_player = player(short_steamID=short_steamID,
 							 long_steamID=long_steamID,
+							 qqid=qqid,
 							 nickname=nickname,
 							 last_DOTA2_match_ID=last_DOTA2_match_ID)
 
@@ -65,6 +67,7 @@ def update(player_num: int):
 def main():
 	if init() != -1:
 		print("初始化完成, 开始更新比赛信息")
+		message_sender.message([{"type": "Plain", "text": "bot initialized."}], 1)
 		while True:
 			player_num = len(PLAYER_LIST)
 			if player_num == 0:

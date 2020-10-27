@@ -39,15 +39,16 @@ def update_DOTA2() -> Dict:
 
 def update_and_send_message_DOTA2():
     # 格式: { match_id1: [player1, player2, player3], match_id2: [player1, player2]}
-    result = update_DOTA2()
-    for match_id in result:
-        if len(result[match_id]) > 1:
-            send(DOTA2.generate_party_message(
+	result = update_DOTA2()
+	for match_id in result:
+		if len(result[match_id]) > 1:
+			send(DOTA2.generate_party_message(
                 match_id=match_id,
                 player_list=result[match_id]
             ))
-        elif len(result[match_id]) == 1:
-            send(DOTA2.generate_solo_message(
+		elif len(result[match_id]) == 1:
+			send(DOTA2.generate_solo_message(
                 match_id=match_id,
                 player_obj=result[match_id][0]
-            ))
+			))
+		print("message sent.")
