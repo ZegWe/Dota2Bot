@@ -12,7 +12,7 @@ bot_qq = 1111111111
 authKey = "xxxxxxx"
 
 
-def message(m: str):
+def message(message: list):
     # Authorize
     auth_key = {"authKey": authKey}
     r = requests.post(url + "/auth", json.dumps(auth_key))
@@ -31,9 +31,7 @@ def message(m: str):
     data = {
             "sessionKey": session_key,
             "target": target,
-            "messageChain": [
-                {"type": "Plain", "text": m}
-            ]
+            "messageChain": message
         }
     r = requests.post(url + "/sendGroupMessage", json.dumps(data))
     # release

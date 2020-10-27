@@ -37,8 +37,10 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
         if response.status_code == 401:
             raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
         if response.status_code == 503:
-            raise DOTA2HTTPError("The server is busy or you exceeded limits. Please wait 30s and try again.")
-        raise DOTA2HTTPError("Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
+            raise DOTA2HTTPError(
+                "The server is busy or you exceeded limits. Please wait 30s and try again.")
+        raise DOTA2HTTPError(
+            "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
 
     match = response.json()
     try:
@@ -62,8 +64,10 @@ def get_match_detail_info(match_id: int) -> Dict:
         if response.status_code == 401:
             raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
         if response.status_code == 503:
-            raise DOTA2HTTPError("The server is busy or you exceeded limits. Please wait 30s and try again.")
-        raise DOTA2HTTPError("Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
+            raise DOTA2HTTPError(
+                "The server is busy or you exceeded limits. Please wait 30s and try again.")
+        raise DOTA2HTTPError(
+            "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
 
     match = response.json()
     try:
@@ -82,7 +86,7 @@ def generate_party_message(match_id: int, player_list: [player]):
     try:
         match = get_match_detail_info(match_id=match_id)
     except DOTA2HTTPError:
-        return "DOTA2开黑战报生成失败"
+        return [{"type": "Plain", "text": "DOTA2开黑战报生成失败"}]
 
     # 比赛模式
     mode_id = match["game_mode"]
@@ -113,36 +117,36 @@ def generate_party_message(match_id: int, player_list: [player]):
                 break
 
     # 队伍信息
-    team = player_list[0].dota2_team
-    team_damage = 0
-    team_kills = 0
-    team_deaths = 0
-    for i in match['players']:
-        if get_team_by_slot(i['player_slot']) == team:
-            team_damage += i['hero_damage']
-            team_kills += i['kills']
-            team_deaths += i['deaths']
+        team = player_list[0].dota2_team
+        team_damage = 0
+        team_kills = 0
+        team_deaths = 0
+        for i in match['players']:
+            if get_team_by_slot(i['player_slot']) == team:
+                team_damage += i['hero_damage']
+                team_kills += i['kills']
+                team_deaths += i['deaths']
 
-    win = False
-    if match['radiant_win'] and team == 1:
-        win = True
-    elif not match['radiant_win'] and team == 2:
-        win = True
-    elif match['radiant_win'] and team == 2:
         win = False
-    elif not match['radiant_win'] and team == 1:
-        win = False
+        if match['radiant_win'] and team == 1:
+            win = True
+        elif not match['radiant_win'] and team == 2:
+            win = True
+        elif match['radiant_win'] and team == 2:
+            win = False
+        elif not match['radiant_win'] and team == 1:
+            win = False
 
-    nicknames = ''
-    if player_num >= 3:
-        for i in range(player_num - 1):
-            nicknames += player_list[i].nickname
-            nicknames += ', '
-    else:
-        nicknames += player_list[0].nickname
+        message = []
+        if player_num >= 3:
+            for i in range(player_num - 1):
+                message.append({"type": "At", "target": i.qqid})
+                message.append({"type": "Plain", "text": ","})
+        else:
+            message.append({"type": "At", "target": player_list[0].qqid})
 
-    nicknames += '和'
-    nicknames += player_list[player_num - 1].nickname
+    message.append({"type": "Plain", "text": "和"})
+    message.append({"type": "At", "target": player_list[player_num - 1].qqid})
 
     top_kda = 0
     for i in player_list:
@@ -161,43 +165,45 @@ def generate_party_message(match_id: int, player_list: [player]):
 
     print_str = ''
     if win and postive:
-        print_str += random.choice(WIN_POSTIVE_PARTY).format(nicknames) + '\n'
+        print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
     elif win and not postive:
-        print_str += random.choice(WIN_NEGATIVE_PARTY).format(nicknames) + '\n'
+        print_str += random.choice(WIN_NEGATIVE_PARTY) + '\n'
     elif not win and postive:
-        print_str += random.choice(LOSE_POSTIVE_PARTY).format(nicknames) + '\n'
+        print_str += random.choice(LOSE_POSTIVE_PARTY) + '\n'
     else:
-        print_str += random.choice(LOSE_NEGATIVE_PARTY).format(nicknames) + '\n'
+        print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
 
-    start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
-    duration = match['duration']
-    print_str += "开始时间: {}\n".format(start_time)
-    print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(duration / 60, duration % 60)
-
-    print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
-
-    for i in player_list:
-        nickname = i.nickname
-        hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
+        start_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
+        duration = match['duration']
+        print_str += "开始时间: {}\n".format(start_time)
+        print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(
+            duration / 60, duration % 60)
+        print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
+        for i in player_list:
+            nickname = i.nickname
+            hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
         kda = i.kda
         last_hits = i.last_hit
         damage = i.damage
         kills, deaths, assists = i.dota2_kill, i.dota2_death, i.dota2_assist
         gpm, xpm = i.gpm, i.xpm
 
-        damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
-        participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
-        deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
+        damage_rate = 0 if team_damage == 0 else (
+            100 * (float(damage) / team_damage))
+        participation = 0 if team_kills == 0 else (
+            100 * float(kills + assists) / team_kills)
+        deaths_rate = 0 if team_deaths == 0 else (
+            100 * float(deaths) / team_deaths)
 
         print_str += "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, " \
                      "补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%\n" \
             .format(nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits,
                     damage, damage_rate, participation, deaths_rate)
-
-    print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
-
-    # print(print_str)
-    return print_str
+        print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(
+            match_id)
+        message.append({"type": "Plain", "target": print_str})
+        return message
 
 
 # 接收某局比赛的玩家信息, 生成单排战报
@@ -206,7 +212,7 @@ def generate_solo_message(match_id: int, player_obj: player):
     try:
         match = get_match_detail_info(match_id=match_id)
     except DOTA2HTTPError:
-        return "DOTA2单排战报生成失败"
+        return [{"type": "Plain", "text": "DOTA2单排战报生成失败"}]
     # 比赛模式
     mode_id = match["game_mode"]
     if mode_id in (15, 19):  # 各种活动模式不通报
@@ -263,42 +269,48 @@ def generate_solo_message(match_id: int, player_obj: player):
             postive = True
         else:
             postive = False
-
+        message = [{"type": "At", "target": player_obj.qqid}]
     print_str = ''
     if win and postive:
-        print_str += random.choice(WIN_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
+        print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
     elif win and not postive:
-        print_str += random.choice(WIN_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
+        print_str += random.choice(WIN_NEGATIVE_PARTY) + '\n'
     elif not win and postive:
-        print_str += random.choice(LOSE_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
+        print_str += random.choice(LOSE_POSTIVE_PARTY) + '\n'
     else:
-        print_str += random.choice(LOSE_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
+        print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
 
-    start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
-    duration = match['duration']
-    print_str += "开始时间: {}\n".format(start_time)
-    print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(duration // 60, duration % 60)
+        start_time = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
+        duration = match['duration']
+        print_str += "开始时间: {}\n".format(start_time)
+        print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(
+            duration // 60, duration % 60)
 
-    print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
+        print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
 
-    nickname = player_obj.nickname
-    hero = HEROES_LIST_CHINESE[player_obj.hero] if player_obj.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
-    kda = player_obj.kda
-    last_hits = player_obj.last_hit
-    damage = player_obj.damage
-    kills, deaths, assists = player_obj.dota2_kill, player_obj.dota2_death, player_obj.dota2_assist
-    gpm, xpm = player_obj.gpm, player_obj.xpm
+        nickname = player_obj.nickname
+        hero = HEROES_LIST_CHINESE[player_obj.hero] if player_obj.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
+        kda = player_obj.kda
+        last_hits = player_obj.last_hit
+        damage = player_obj.damage
+        kills, deaths, assists = player_obj.dota2_kill, player_obj.dota2_death, player_obj.dota2_assist
+        gpm, xpm = player_obj.gpm, player_obj.xpm
 
-    damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
-    participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
-    deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
+        damage_rate = 0 if team_damage == 0 else (
+            100 * (float(damage) / team_damage))
+        participation = 0 if team_kills == 0 else (
+            100 * float(kills + assists) / team_kills)
+        deaths_rate = 0 if team_deaths == 0 else (
+            100 * float(deaths) / team_deaths)
 
-    print_str += "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, " \
-                 "补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%\n" \
-        .format(nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits,
-                damage, damage_rate, participation, deaths_rate)
+        print_str += "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, " \
+            "补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%\n" \
+            .format(nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits,
+                    damage, damage_rate, participation, deaths_rate)
 
-    print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
+        print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(
+            match_id)
 
-    # print(print_str)
-    return print_str
+        message.append({"type": "Plain", "text": print_str})
+        return message
