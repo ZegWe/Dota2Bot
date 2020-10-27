@@ -67,6 +67,7 @@ def update(player_num: int):
 def main():
 	if init() != -1:
 		print("初始化完成, 开始更新比赛信息")
+		message_sender.message([{"type": "Plain", "text": "bot initialized."}], 1)
 		while True:
 			player_num = len(PLAYER_LIST)
 			if player_num == 0:

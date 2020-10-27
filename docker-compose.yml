@@ -2,7 +2,7 @@ version: '3.0'
 services: 
   dota2_bot: 
     build: .
-    ports: 
-      - "8080:8080"
+    ports:
+        - host
     volumes:
       - ${PWD}/config.json:/opt/dota2bot/config.json
