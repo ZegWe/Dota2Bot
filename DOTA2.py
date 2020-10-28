@@ -185,7 +185,7 @@ def generate_party_message(match_id: int, player_list: [player]):
 		damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
 		participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 		deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
-		print_str = "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, 补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%\n" \
+		print_str = "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, 补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%" \
 			.format("[ATUSER("+str(i.qqid)+")]", hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
 		m.append(print_str)
 	return m
@@ -284,7 +284,7 @@ def generate_solo_message(match_id: int, player_obj: player):
 	participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 	deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
 
-	print_str = "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, 补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%\n" \
+	print_str = "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, 补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%" \
             .format("[ATUSER("+str(player_obj.qqid)+")]", hero, kda, kills, deaths, assists, gpm, xpm, last_hits,damage, damage_rate, participation, deaths_rate)
 	m.append(print_str)
 	return m
