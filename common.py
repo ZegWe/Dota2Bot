@@ -23,7 +23,7 @@ def update_DOTA2() -> Dict:
             match_id = DOTA2.get_last_match_id_by_short_steamID(i.short_steamID)
         except DOTA2.DOTA2HTTPError:
             continue
-        if match_id != i.last_DOTA2_match_ID:
+        if match_id != 0:
 
             if result.get(match_id, 0) != 0:
                 result[match_id].append(i)
@@ -42,13 +42,8 @@ def update_and_send_message_DOTA2():
 	result = update_DOTA2()
 	for match_id in result:
 		if len(result[match_id]) > 1:
-			send(DOTA2.generate_party_message(
-                match_id=match_id,
-                player_list=result[match_id]
-            ))
+			for i in DOTA2.generate_party_message(match_id=match_id,player_list=result[match_id]):
+				send(i)
 		elif len(result[match_id]) == 1:
-			send(DOTA2.generate_solo_message(
-                match_id=match_id,
-                player_obj=result[match_id][0]
-			))
-		print("message sent.")
+			for i in DOTA2.generate_solo_message(match_id=match_id, player_obj=result[match_id][0]):
+				send(i)
