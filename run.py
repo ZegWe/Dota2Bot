@@ -20,6 +20,7 @@ def init():
 		message_sender.url = config["mirai_url"]
 		message_sender.authKey = config["mirai_auth_key"]
 		message_sender.bot_qq = config["bot_qq"]
+		message_sender.admin_qq = config["admin_qq"]
 		message_sender.target = config["qq_group_id"]
 		player_list = config["player_list"]
 	except Exception:

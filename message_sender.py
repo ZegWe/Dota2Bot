@@ -7,6 +7,8 @@ url = "http://127.0.0.1:8080"
 # 群号
 target = 1111111111
 # bot的QQ号
+admin_qq = 1111111111
+# 管理员的QQ号，用于监控bot
 bot_qq = 1111111111
 # mirai http的auth key
 authKey = "xxxxxxx"
@@ -37,7 +39,7 @@ def message(message: list, type=0):
 	else:
 		data = {
             "sessionKey": session_key,
-            "target": 1278300305,
+            "target": admin_qq,
             "messageChain": message
 		}
 	if type == 0:
