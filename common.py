@@ -23,7 +23,7 @@ def update_DOTA2() -> Dict:
             match_id = DOTA2.get_last_match_id_by_short_steamID(i.short_steamID)
         except DOTA2.DOTA2HTTPError:
             continue
-        if match_id != 0:
+        if match_id != i.last_DOTA2_match_ID:
 
             if result.get(match_id, 0) != 0:
                 result[match_id].append(i)
