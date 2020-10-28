@@ -6,37 +6,28 @@
 
 ### Prepare
 
-Download [MiraiOK](https://github.com/LXY1226/MiraiOK).
+Install and run [OPQ](https://github.com/OPQBOT/OPQ)
 
-Run `MiraiOK` once and close it, there would be a `plugins` flolder.
+Install [Docker](https://docs.docker.com/engine/install/)
 
-move the `jar` file in [mirai-http-api](https://github.com/project-mirai/mirai-api-http) release into the `plugins` folder.
-
-Run `MiraiOK` with `screen` and sgin in with your QQ account.
+### Run
+Pull docker image from [DockerHub](https://hub.docker.com/r/zegwe/dota2bot)
 ```bash
-screen -S bot && ./miraiOK_linux-amd64
+docker pull zegwe/dota2bot:latest
 ```
 
-Use `Ctrl+a + d` to go back.
-
-(use `screen -x bot` if you want to re-enter MiraiOK command-line.)
-
-Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
-
-### Install
-Download this Repo.
-```bash
-git clone https://github.com/ZegWe/Dota2Bot.git
-```
-
-Create and edit configuration file.
+Create `playerInfo.db` file.
 ```bash
 cd Dota2Bot
-cp config.example.json config.json
+touch playerInfo.db
+```
+
+Create and edit `config.json` file
+```bash
 vim config.json
 ```
 
-Run with docker-compose.
+Run with `Docker`.
 ```bash
-docker-compose up -d
+docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/playerInfo.db:/opt/dota2bot/playerInfo.db --name dota2bot zegwe/dota2bot:latest
 ```
