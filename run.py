@@ -17,8 +17,7 @@ def init():
 		args = parser.parse_args()
 		config = json.load(open(args.config, "r", encoding='UTF-8'))
 		DOTA2.api_key = config["api_key"]
-		message_sender.url = config["mirai_url"]
-		message_sender.authKey = config["mirai_auth_key"]
+		message_sender.url = config["opq_url"]
 		message_sender.bot_qq = config["bot_qq"]
 		message_sender.admin_qq = config["admin_qq"]
 		message_sender.target = config["qq_group_id"]
@@ -68,7 +67,7 @@ def update(player_num: int):
 def main():
 	if init() != -1:
 		print("初始化完成, 开始更新比赛信息")
-		message_sender.message([{"type": "Plain", "text": "bot initialized."}], 1)
+		message_sender.message("hello", 1)
 		while True:
 			player_num = len(PLAYER_LIST)
 			if player_num == 0:

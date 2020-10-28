@@ -86,7 +86,7 @@ def generate_party_message(match_id: int, player_list: [player]):
     try:
         match = get_match_detail_info(match_id=match_id)
     except DOTA2HTTPError:
-        return [{"type": "Plain", "text": "DOTA2开黑战报生成失败"}]
+        return "DOTA2开黑战报生成失败"
 
     # 比赛模式
     mode_id = match["game_mode"]
@@ -137,16 +137,14 @@ def generate_party_message(match_id: int, player_list: [player]):
         elif not match['radiant_win'] and team == 1:
             win = False
 
-        message = []
+        print_str = ""
         if player_num >= 3:
             for i in range(player_num - 1):
-                message.append({"type": "At", "target": i.qqid})
-                message.append({"type": "Plain", "text": ","})
+                print_str += "[ATUSER(" + str(player_list[i].qqid) + ")],"
         else:
-            message.append({"type": "At", "target": player_list[0].qqid})
+            print_str += "[ATUSER(" + str(player_list[0].qqid) + ")]"
 
-    message.append({"type": "Plain", "text": "和"})
-    message.append({"type": "At", "target": player_list[player_num - 1].qqid})
+    print_str += "和[ATUSER(" + str(player_list[player_num-1].qqid) + ")]"
 
     top_kda = 0
     for i in player_list:
@@ -163,7 +161,6 @@ def generate_party_message(match_id: int, player_list: [player]):
         else:
             postive = False
 
-    print_str = ''
     if win and postive:
         print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
     elif win and not postive:
@@ -202,8 +199,7 @@ def generate_party_message(match_id: int, player_list: [player]):
                     damage, damage_rate, participation, deaths_rate)
         print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(
             match_id)
-        message.append({"type": "Plain", "target": print_str})
-        return message
+        return print_str
 
 
 # 接收某局比赛的玩家信息, 生成单排战报
@@ -212,7 +208,7 @@ def generate_solo_message(match_id: int, player_obj: player):
     try:
         match = get_match_detail_info(match_id=match_id)
     except DOTA2HTTPError:
-        return [{"type": "Plain", "text": "DOTA2单排战报生成失败"}]
+        return "DOTA2单排战报生成失败"
     # 比赛模式
     mode_id = match["game_mode"]
     if mode_id in (15, 19):  # 各种活动模式不通报
@@ -269,8 +265,7 @@ def generate_solo_message(match_id: int, player_obj: player):
             postive = True
         else:
             postive = False
-        message = [{"type": "At", "target": player_obj.qqid}]
-    print_str = ''
+    print_str = "[ATUSER(" + str(player_obj.qqid) + ")]"
     if win and postive:
         print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
     elif win and not postive:
@@ -312,5 +307,4 @@ def generate_solo_message(match_id: int, player_obj: player):
         print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(
             match_id)
 
-        message.append({"type": "Plain", "text": print_str})
-        return message
+        return print_str
