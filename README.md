@@ -26,6 +26,20 @@ Create and edit `config.json` file
 ```bash
 vim config.json
 ```
+Here's a example for `config.json`
+```json
+{
+	"api_key": "xxxxx",
+	"bot_qq": 1234567890,
+	"admin_qq": 1234567890,
+	"qq_group_id": 1234567890,
+	"opq_url": "http://127.0.0.1:8080",
+	"is_update_DOTA2": true,
+	"player_list": [
+		["圣果皇", 280353932, 1234567890]
+	] 
+}
+```
 
 Run with `Docker`.
 ```bash
