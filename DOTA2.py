@@ -122,8 +122,8 @@ def generate_party_message(match_id: int, player_list: [player]):
 	for i in match['players']:
 		if get_team_by_slot(i['player_slot']) == team:
 			team_damage += i['hero_damage']
-		team_kills += i['kills']
-		team_deaths += i['deaths']
+			team_kills += i['kills']
+			team_deaths += i['deaths']
 
 	win = False
 	if match['radiant_win'] and team == 1:
@@ -166,7 +166,7 @@ def generate_party_message(match_id: int, player_list: [player]):
 		print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
 
 	start_time = time.strftime(
-		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
+		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time'] + 8*60*60))
 	duration = match['duration']
 	print_str += "开始时间: {}\n".format(start_time)
 	print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(
@@ -265,7 +265,7 @@ def generate_solo_message(match_id: int, player_obj: player):
 		print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
 
 	start_time = time.strftime(
-		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']))
+		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']+8*60*60))
 	duration = match['duration']
 	print_str += "开始时间: {}\n".format(start_time)
 	print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(duration // 60, duration % 60)
