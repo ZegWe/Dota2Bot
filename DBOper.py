@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 import sqlite3
 from player import player, PLAYER_LIST
-conn = sqlite3.connect('playerInfo')
+conn = sqlite3.connect('playerInfo.db')
 c = conn.cursor()
 
 c.execute('''CREATE TABLE IF NOT EXISTS playerInfo

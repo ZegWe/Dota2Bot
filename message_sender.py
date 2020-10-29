@@ -28,7 +28,10 @@ def message(message: str, type=0):
             "Content": message
 		}
 	r = requests.post(url + "?qq=" + str(bot_qq) + "&funcname=SendMsgV2", json.dumps(data))
+	print(data)
 	if json.loads(r.text).get('Ret') != 0:
 		print("message sending failed.")
+		print(r.text)
+		return
 	print("message sending succeeded")
     # print(r.text)

@@ -18,6 +18,7 @@ docker pull zegwe/dota2bot:latest
 
 Create `playerInfo.db` file.
 ```bash
+mkdir Dota2Bot
 cd Dota2Bot
 touch playerInfo.db
 ```
@@ -26,7 +27,7 @@ Create and edit `config.json` file
 ```bash
 vim config.json
 ```
-Here's a example for `config.json`
+Here's an example for `config.json`
 ```json
 {
 	"api_key": "xxxxx",
