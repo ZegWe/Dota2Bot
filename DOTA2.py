@@ -137,7 +137,7 @@ def generate_party_message(match_id: int, player_list: [player]):
 
 	print_str = ""
 	for i in range(player_num - 1):
-		print_str += player_list[i].nickname
+		print_str += player_list[i].nickname+', '
 
 	print_str += "和"+player_list[player_num-1].nickname
 
