@@ -82,16 +82,16 @@ def get_match_detail_info(match_id: int) -> Dict:
 
 # 接收某局比赛的玩家列表, 生成开黑战报
 # 参数为玩家对象列表和比赛ID
-def generate_party_message(match_id: int, player_list: [player]):
+def generate_party_message(match_id: int, player_list: [player]) -> list:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
-		return "DOTA2开黑战报生成失败"
+		return ["DOTA2开黑战报生成失败"]
 
     # 比赛模式
 	mode_id = match["game_mode"]
 	if mode_id in (15, 19):  # 各种活动模式不通报
-		return
+		return []
 	mode = GAME_MODE[mode_id] if mode_id in GAME_MODE else '未知'
 
 	lobby_id = match['lobby_type']
@@ -157,13 +157,13 @@ def generate_party_message(match_id: int, player_list: [player]):
 			postive = False
 
 	if win and postive:
-		print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
+		print_str += random.choice(WIN_POSTIVE_PARTY).format(print_str) + '\n'
 	elif win and not postive:
-		print_str += random.choice(WIN_NEGATIVE_PARTY) + '\n'
+		print_str += random.choice(WIN_NEGATIVE_PARTY).format(print_str) + '\n'
 	elif not win and postive:
-		print_str += random.choice(LOSE_POSTIVE_PARTY) + '\n'
+		print_str += random.choice(LOSE_POSTIVE_PARTY).format(print_str) + '\n'
 	else:
-		print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
+		print_str += random.choice(LOSE_NEGATIVE_PARTY).format(print_str) + '\n'
 
 	start_time = time.strftime(
 		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time'] + 8*60*60))
@@ -193,15 +193,15 @@ def generate_party_message(match_id: int, player_list: [player]):
 
 # 接收某局比赛的玩家信息, 生成单排战报
 # 参数为玩家对象
-def generate_solo_message(match_id: int, player_obj: player):
+def generate_solo_message(match_id: int, player_obj: player) -> list:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
-		return "DOTA2单排战报生成失败"
+		return ["DOTA2单排战报生成失败"]
     # 比赛模式
 	mode_id = match["game_mode"]
 	if mode_id in (15, 19):  # 各种活动模式不通报
-		return
+		return []
 	mode = GAME_MODE[mode_id] if mode_id in GAME_MODE else '未知'
 
 	lobby_id = match['lobby_type']
@@ -254,15 +254,15 @@ def generate_solo_message(match_id: int, player_obj: player):
 			postive = True
 		else:
 			postive = False
-	print_str = player_obj.nickname
+	print_str = ""
 	if win and postive:
-		print_str += random.choice(WIN_POSTIVE_PARTY) + '\n'
+		print_str += random.choice(WIN_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
 	elif win and not postive:
-		print_str += random.choice(WIN_NEGATIVE_PARTY) + '\n'
+		print_str += random.choice(WIN_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
 	elif not win and postive:
-		print_str += random.choice(LOSE_POSTIVE_PARTY) + '\n'
+		print_str += random.choice(LOSE_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
 	else:
-		print_str += random.choice(LOSE_NEGATIVE_PARTY) + '\n'
+		print_str += random.choice(LOSE_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
 
 	start_time = time.strftime(
 		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']+8*60*60))
