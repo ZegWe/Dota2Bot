@@ -157,13 +157,13 @@ def generate_party_message(match_id: int, player_list: [player]) -> list:
 			postive = False
 
 	if win and postive:
-		print_str += random.choice(WIN_POSTIVE_PARTY).format(print_str) + '\n'
+		print_str = random.choice(WIN_POSTIVE_PARTY).format(print_str) + '\n'
 	elif win and not postive:
-		print_str += random.choice(WIN_NEGATIVE_PARTY).format(print_str) + '\n'
+		print_str = random.choice(WIN_NEGATIVE_PARTY).format(print_str) + '\n'
 	elif not win and postive:
-		print_str += random.choice(LOSE_POSTIVE_PARTY).format(print_str) + '\n'
+		print_str = random.choice(LOSE_POSTIVE_PARTY).format(print_str) + '\n'
 	else:
-		print_str += random.choice(LOSE_NEGATIVE_PARTY).format(print_str) + '\n'
+		print_str = random.choice(LOSE_NEGATIVE_PARTY).format(print_str) + '\n'
 
 	start_time = time.strftime(
 		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time'] + 8*60*60))
