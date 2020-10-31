@@ -90,7 +90,7 @@ def generate_party_message(match_id: int, player_list: [player]) -> list:
 
     # 比赛模式
 	mode_id = match["game_mode"]
-	if mode_id in (15):  # 各种活动模式不通报
+	if mode_id in [15]:  # 各种活动模式不通报
 		return []
 	mode = GAME_MODE[mode_id] if mode_id in GAME_MODE else '未知'
 
@@ -200,7 +200,7 @@ def generate_solo_message(match_id: int, player_obj: player) -> list:
 		return ["DOTA2单排战报生成失败"]
     # 比赛模式
 	mode_id = match["game_mode"]
-	if mode_id in (15):  # 各种活动模式不通报
+	if mode_id in [15]:  # 各种活动模式不通报
 		return []
 	mode = GAME_MODE[mode_id] if mode_id in GAME_MODE else '未知'
 
