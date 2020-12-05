@@ -33,12 +33,15 @@ def message(message: str, type=0):
 	global last_send_time
 	if time.time() - last_send_time < 1.1:
 		time.sleep(1.1 - time.time() + last_send_time)
-	r = requests.post(url + "?qq=" + str(bot_qq) + "&funcname=SendMsgV2", json.dumps(data))
-	last_send_time = time.time()
-	print(data)
-	if json.loads(r.text).get('Ret') != 0:
-		print("message sending failed.")
-		print(r.text)
-		return
-	print("message sending succeeded")
+	try:
+		r = requests.post(url + "?qq=" + str(bot_qq) + "&funcname=SendMsgV2", json.dumps(data))
+		last_send_time = time.time()
+		print(data)
+		if json.loads(r.text).get('Ret') != 0:
+			print("message sending failed.")
+			print(r.text)
+			return
+		print("message sending succeeded")
+	except:
+		print("post request error")
     # print(r.text)
