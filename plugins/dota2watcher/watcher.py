@@ -7,9 +7,13 @@ from model.plugin import Plugin
 from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, generate_solo_message, steam_id_convert_32_to_64
 import Config
 import asyncio
-import socketio
 import re
+from threading import Thread
 
+
+def start_loop(loop):
+	asyncio.set_event_loop(loop)
+	loop.run_forever()
 
 class Watcher(Plugin):
 	"""
@@ -22,6 +26,11 @@ class Watcher(Plugin):
 		self.db = DB(group_id)
 		self.PLAYER_LIST = self.db.get_list()
 		self.result = {}
+		self.running = True
+		print('initializing group({})'.format(group_id))
+		loop = asyncio.new_event_loop()
+		Thread(target=start_loop, args=(loop,)).start()
+		asyncio.run_coroutine_threadsafe(self._update(), loop)
 
 	async def _update_player(self, player: Player):
 		try:
@@ -39,57 +48,100 @@ class Watcher(Plugin):
 			player.last_DOTA2_match_ID = match_id
 		return player
 
-
 	async def _update(self):
-		while self.on():
-			self.result.clear()
-			if len(self.PLAYER_LIST) == 0:
-				time.sleep(10)
-				continue
-			for player in self.PLAYER_LIST:
-				player = await self._update_player(player)
-			for match_id in self.result:
-				if len(self.result[match_id]) > 1:
-					for message in generate_party_message(match_id, self.result[match_id]):
-						self.sender.send(message)
-				elif len(self.result[match_id]) == 1:
-					for message in generate_solo_message(match_id, self.result[match_id][0]):
-						self.sender.send(message)
+		time.sleep(1)
+		print('Watch Loop started: {}'.format(self.group_id))
+		while self.running:
+			if self.On():
+				self.result.clear()
+				if len(self.PLAYER_LIST) == 0:
+					time.sleep(10)
+					continue
+				for player in self.PLAYER_LIST:
+					player = await self._update_player(player)
+				for match_id in self.result:
+					if len(self.result[match_id]) > 1:
+						for message in generate_party_message(match_id, self.result[match_id]):
+							self.sender.send(message)
+					elif len(self.result[match_id]) == 1:
+						for message in generate_solo_message(match_id, self.result[match_id][0]):
+							self.sender.send(message)
 			time.sleep((24*60*60)/(100000/(2*len(self.PLAYER_LIST))))
 
 	def Set(self, on: bool):
-		if on == self._on:
-			return
 		self._on = on
-		if on:
-			asyncio.set_event_loop(asyncio.new_event_loop())
-			socketio.AsyncClient().start_background_task(self._update)
+
+	def shutdown(self):
+		self.running = False
 
 	def add_watch(self, nickname, shortID, qqid):
 		if self.db.is_player_stored(shortID):
 			print('Already added')
-			self.sender.send('该玩家已经存在，请勿重复添加')
+			self.sender.send('该账号已经存在，请勿重复添加！')
 			return
 		longID = steam_id_convert_32_to_64(shortID)
 		last_match = get_last_match_id_by_short_steamID(shortID)
 		self.db.insert_info(shortID, longID, qqid, nickname, last_match)
 		self.PLAYER_LIST.append(Player(nickname, qqid, shortID, longID, last_match))
 		print('Player information added successfully')
-		self.sender.send('添加玩家成功')
+		self.sender.send('添加监视成功！')
+
+	def remove_watch(self, index: int):
+		try:
+			shortID = self.PLAYER_LIST[index - 1].short_steamID
+		except Exception as e:
+			print('Remove Watch Error Index: {}'.format(e))
+			self.sender.send('请输入正确的序号！')
+		try:
+			if self.db.is_player_stored(shortID):
+				self.db.delete_info(shortID)
+			del self.PLAYER_LIST[index-1]
+		except Exception as e:
+			print('Remove Watch Error: {}'.format(e))
+			self.sender.send('移除监视失败！')
+		else:
+			print('Remove Watch Successfully!')
+			self.sender.send('移除监视成功！')
 
 	def show_watch(self):
-		m = '以下账号正在监视中：'
+		m = '以下账号被监视中：'
 		for index, player in enumerate(self.PLAYER_LIST):
 			m += '\n{}. {}({})'.format(index + 1, player.nickname, player.short_steamID)
+			if index % 8 == 6:
+				self.sender.send(m)
+				m = ''
 		
 		if len(self.PLAYER_LIST) == 0:
-			m = '没有正在监视的玩家！'
-		self.sender.send(m)
+			m = '没有正在监视的账号！'
+			return
+		if len(m):
+			self.sender.send(m)
 
 	def handle(self, m: str) -> bool:
-		if re.match(r'^[！!]查看玩家$', m):
+		if re.match(r'^[！!]查看监视$', m):
 			self.show_watch()
 			return True
+		elif re.match(r'^[!！]移除监视\s+\S+', m):
+			try:
+				s = re.match(r'^[!！]移除监视\s+\S+', m)[0]
+				index = int(re.split(r'\s+', s)[1])
+				self.remove_watch(index)
+			except Exception as e:
+				print('Remove Watch Error Argument: {}'.format(e))
+				self.sender.send('请输入正确的参数！')
+			finally: return True
+		elif re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m):
+			try:
+				s = re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m)[0]
+				# print(s)
+				_, nickname, steamID, qqid = re.split(r'\s+', s)
+				# print(nickname, steamID, qqid)
+				self.add_watch(nickname, int(steamID), int(qqid))
+			except Exception as e:
+				print('Add Watch Error Argument: {}'.format(e))
+				self.sender.send('请输入正确的参数！')
+			finally: return True
+
 		return False
 
 def test():

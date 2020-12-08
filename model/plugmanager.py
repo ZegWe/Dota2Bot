@@ -76,3 +76,7 @@ class PluginManager(object):
 		else:
 			print('Plugin {} Disabled!'.format(self.plugins[index - 1].get_name()))
 			self.sender.send('插件 {} 已禁用'.format(self.plugins[index-1].get_name()))
+
+	def shutdown(self):
+		for plugin in self.plugins:
+			plugin.shutdown()

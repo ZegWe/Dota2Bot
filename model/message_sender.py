@@ -36,6 +36,9 @@ class GroupSender(MsgSender):
 		try:
 			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
+			if json.loads(r.text).get('Ret') == 241:
+				time.sleep(0.5)
+				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			last_send_time = time.time()
 			print(data)
 			if json.loads(r.text).get('Ret') != 0:

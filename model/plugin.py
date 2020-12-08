@@ -23,5 +23,8 @@ class Plugin(object):
 	def On(self) -> bool:
 		return self._on
 
+	def shutdown(self):
+		pass
+
 	def handle(self, data: str):
 		pass

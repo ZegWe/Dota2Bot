@@ -5,8 +5,8 @@ import json
 import Config
 import asyncio
 from model.plugmanager import PluginManager
-sio = socketio.Client()
 
+sio = socketio.Client()
 managers = {}
 
 @sio.event
@@ -51,4 +51,7 @@ if __name__ == "__main__":
 	try:
 		sio.wait()
 	except KeyboardInterrupt:
+		for group in managers:
+			managers[group].shutdown()
 		print('Say you next time~')
+		exit(0)

@@ -2,8 +2,8 @@ FROM python:3.7-alpine
 
 LABEL author="ZegWe"
 
-RUN pip install requests
-WORKDIR /opt/dota2bot/
-COPY . .
-COPY config.example.json config.json
-ENTRYPOINT ["python", "run.py", "-c", "./config.json"]
+COPY requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+WORKDIR /opt/bot/
+
+ENTRYPOINT ["python", "app.py", "-c", "./config.json"]
