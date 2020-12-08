@@ -1,21 +1,22 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import requests
-from DOTA2_dicts import *
-from player import player
+from .DOTA2_dicts import *
+from model.player import Player
 import random
 import time
-from typing import Dict
-
-# 这里替换成你自己的API
-# http://steamcommunity.com/dev/apikey
-api_key = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
+import Config
 
 # 异常处理
 class DOTA2HTTPError(Exception):
     pass
 
+def steam_id_convert_32_to_64(short_steamID: int) -> int:
+    return short_steamID + 76561197960265728
+
+
+def steam_id_convert_64_to_32(long_steamID: int) -> int:
+    return long_steamID - 76561197960265728
 
 # 根据slot判断队伍, 返回1为天辉, 2为夜魇
 def get_team_by_slot(slot: int) -> int:
@@ -28,7 +29,7 @@ def get_team_by_slot(slot: int) -> int:
 def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
     # get match_id
     url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v001/?key={}' \
-          '&account_id={}&matches_requested=1'.format(api_key, short_steamID)
+          '&account_id={}&matches_requested=1'.format(Config.api_key, short_steamID)
     try:
         response = requests.get(url)
     except requests.RequestException:
@@ -52,10 +53,10 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
     return match_id
 
 
-def get_match_detail_info(match_id: int) -> Dict:
+def get_match_detail_info(match_id: int) -> dict:
     # get match detail
     url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/' \
-          '?key={}&match_id={}'.format(api_key, match_id)
+          '?key={}&match_id={}'.format(Config.api_key, match_id)
     try:
         response = requests.get(url)
     except requests.RequestException:
@@ -82,7 +83,7 @@ def get_match_detail_info(match_id: int) -> Dict:
 
 # 接收某局比赛的玩家列表, 生成开黑战报
 # 参数为玩家对象列表和比赛ID
-def generate_party_message(match_id: int, player_list: [player]) -> list:
+def generate_party_message(match_id: int, player_list: [Player]) -> list:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
@@ -193,7 +194,7 @@ def generate_party_message(match_id: int, player_list: [player]) -> list:
 
 # 接收某局比赛的玩家信息, 生成单排战报
 # 参数为玩家对象
-def generate_solo_message(match_id: int, player_obj: player) -> list:
+def generate_solo_message(match_id: int, player_obj: Player) -> list:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:

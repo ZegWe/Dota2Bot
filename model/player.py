@@ -2,13 +2,12 @@
 # -*- coding: UTF-8 -*-
 
 
-class player:
+class Player:
     # 基本属性
 	short_steamID = 0
 	long_steamID = 0
 	qqid = 0
 	nickname = ''
-	DOTA2_score = ''
 	last_DOTA2_match_ID = ''
 
     # 玩家在最新的一场比赛中的数据
@@ -31,6 +30,3 @@ class player:
 		self.short_steamID = short_steamID
 		self.long_steamID = long_steamID
 		self.last_DOTA2_match_ID = last_DOTA2_match_ID
-
-
-PLAYER_LIST = []
