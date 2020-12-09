@@ -5,7 +5,6 @@ from .player import Player
 
 class DB:
 	def __init__(self, group_id: str):
-		print('Initializing database...', end='', flush=True)
 		self.group_id = group_id
 		if not hasattr(self, 'c'):
 			self.connect('playerInfo.db')
@@ -16,13 +15,14 @@ class DB:
 		qqid INT NOT NULL,
 		last_DOTA2_match_ID INT);
 		'''.format(group_id))
-		print('\r', end='', flush=True)
-		print('\033[0;32mSqlite database initialized.\033[0m', flush=True)
 
 	@classmethod
 	def connect(cls, db_file: str):
+		print('Initializing database...', end='', flush=True)
 		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
 		cls.c = cls.conn.cursor()
+		print('\r', end='', flush=True)
+		print('\033[0;32mSqlite database initialized.\033[0m', flush=True)
 
 	def get_list(self):
 		PLAYER_LIST = []

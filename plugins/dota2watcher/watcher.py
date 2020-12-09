@@ -110,9 +110,9 @@ class Watcher(Plugin):
 			if index % 8 == 6:
 				self.sender.send(m)
 				m = ''
-		
 		if len(self.PLAYER_LIST) == 0:
 			m = '没有正在监视的账号！'
+			self.sender.send(m)
 			return
 		if len(m):
 			self.sender.send(m)
