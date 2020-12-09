@@ -80,3 +80,4 @@ class PluginManager(object):
 	def shutdown(self):
 		for plugin in self.plugins:
 			plugin.shutdown()
+		print('manager({}) shutdown'.format(self.group_id))

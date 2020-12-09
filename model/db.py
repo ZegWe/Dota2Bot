@@ -24,6 +24,10 @@ class DB:
 		print('\r', end='', flush=True)
 		print('\033[0;32mSqlite database initialized.\033[0m', flush=True)
 
+	@classmethod
+	def disconnect(cls):
+		cls.conn.close()
+
 	def get_list(self):
 		PLAYER_LIST = []
 		cursor = self.c.execute("SELECT * from `playerInfo-{}`".format(self.group_id))

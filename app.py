@@ -5,6 +5,7 @@ import json
 import Config
 import asyncio
 from model.plugmanager import PluginManager
+from model.db import DB
 
 sio = socketio.Client()
 managers = {}
@@ -53,5 +54,6 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		for group in managers:
 			managers[group].shutdown()
+		DB.disconnect()
 		print('Say you next time~')
 		exit(0)

@@ -24,7 +24,7 @@ class Plugin(object):
 		return self._on
 
 	def shutdown(self):
-		pass
+		print('plugin {} shutdown'.format(self.get_name()))
 
 	def handle(self, data: str):
 		pass

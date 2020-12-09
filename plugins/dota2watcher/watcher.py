@@ -24,8 +24,10 @@ class Watcher(Plugin):
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__(group_id, sender)
 		self.db = DB(group_id)
-		self.PLAYER_LIST = self.db.get_list()
 		self.result = {}
+		self.PLAYER_LIST = self.db.get_list()
+		for player in self.PLAYER_LIST:
+			player = self._update_player(player)
 		self.running = True
 		print('initializing group({})'.format(group_id))
 		loop = asyncio.new_event_loop()
@@ -52,11 +54,11 @@ class Watcher(Plugin):
 		time.sleep(1)
 		print('Watch Loop started: {}'.format(self.group_id))
 		while self.running:
+			self.result.clear()
+			if len(self.PLAYER_LIST) == 0:
+				time.sleep(5)
+				continue
 			if self.On():
-				self.result.clear()
-				if len(self.PLAYER_LIST) == 0:
-					time.sleep(10)
-					continue
 				for player in self.PLAYER_LIST:
 					player = await self._update_player(player)
 				for match_id in self.result:
@@ -66,13 +68,15 @@ class Watcher(Plugin):
 					elif len(self.result[match_id]) == 1:
 						for message in generate_solo_message(match_id, self.result[match_id][0]):
 							self.sender.send(message)
-			time.sleep((24*60*60)/(100000/(2*len(self.PLAYER_LIST))))
+			time.sleep((24 * 60 * 60) / (100000 / (2 * len(self.PLAYER_LIST))))
+		print('Watching Loop exited: {}'.format(self.group_id))
 
 	def Set(self, on: bool):
 		self._on = on
 
 	def shutdown(self):
 		self.running = False
+		super().shutdown()
 
 	def add_watch(self, nickname, shortID, qqid):
 		if self.db.is_player_stored(shortID):
