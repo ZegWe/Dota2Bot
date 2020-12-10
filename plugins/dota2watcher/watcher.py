@@ -10,6 +10,7 @@ import Config
 import asyncio
 import re
 from threading import Thread
+from typing import List
 
 
 def start_loop(loop: AbstractEventLoop):
@@ -26,7 +27,7 @@ class Watcher(Plugin):
 		super().__init__(group_id, sender)
 		self.db = DB(group_id)
 		self.result = {}
-		self.PLAYER_LIST = self.db.get_list()
+		self.PLAYER_LIST : List[Player] = self.db.get_list()
 		for player in self.PLAYER_LIST:
 			player = self.update_player(player)
 		self.running = True
@@ -116,7 +117,7 @@ class Watcher(Plugin):
 		try:
 			if self.db.is_player_stored(shortID):
 				self.db.delete_info(shortID)
-			del self.PLAYER_LIST[index-1]
+			del self.PLAYER_LIST[index - 1]
 		except Exception as e:
 			print('Remove Watch Error: {}'.format(e))
 			self.sender.send('移除监视失败！')
@@ -167,4 +168,4 @@ class Watcher(Plugin):
 
 def test():
 	Config.Load('./config.json')
-	DB.connect('playerInfo.db', )
+	DB.connect('playerInfo.db')
