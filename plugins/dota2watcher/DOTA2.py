@@ -6,6 +6,7 @@ from model.player import Player
 import random
 import time
 import Config
+from typing import List
 
 # 异常处理
 class DOTA2HTTPError(Exception):
@@ -83,7 +84,7 @@ def get_match_detail_info(match_id: int) -> dict:
 
 # 接收某局比赛的玩家列表, 生成开黑战报
 # 参数为玩家对象列表和比赛ID
-def generate_party_message(match_id: int, player_list: [Player]) -> list:
+def generate_party_message(match_id: int, player_list: List[Player]) -> list:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
@@ -109,7 +110,7 @@ def generate_party_message(match_id: int, player_list: [Player]) -> list:
 				i.kda = ((1. * i.dota2_kill + i.dota2_assist) / i.dota2_death) if i.dota2_death != 0 else (1. * i.dota2_kill + i.dota2_assist)
 
 				i.dota2_team = get_team_by_slot(j['player_slot'])
-				i.hero = j['hero_id']
+				i.hero = int(j['hero_id'])
 				i.last_hit = j['last_hits']
 				i.damage = j['hero_damage']
 				i.gpm = j['gold_per_min']

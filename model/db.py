@@ -1,62 +1,35 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+from os import error
 import sqlite3
 from .player import Player
 
-class DB:
-	def __init__(self, group_id: str):
+class BaseDB:
+	"""
+	基于sqlite封装的数据库对象
+	所有实例共用同一个数据库文件，根据不同群号来区分不同表
+	已封装connect和disconnect函数
+	"""
+	def __init__(self, group_id: int):
+		raise SyntaxError
 		self.group_id = group_id
-		if not hasattr(self, 'c'):
-			self.connect('playerInfo.db')
-		self.c.execute('''CREATE TABLE IF NOT EXISTS `playerInfo-{}`
-		(short_steamID INT PRIMARYKEY NOT NULL,
-		long_steamID INT NOT NULL,
-		nickname CHAR(50) NOT NULL,
-		qqid INT NOT NULL,
-		last_DOTA2_match_ID INT);
-		'''.format(group_id))
 
 	@classmethod
-	def connect(cls, db_file: str):
-		print('Initializing database...', end='', flush=True)
+	def connect(cls, db_file: str, name: str):
+		"""
+		创建数据库文件连接，注意：这是一个类方法！
+		"""
+		raise SyntaxError
+		print('Initializing {}...'.format(name), end='', flush=True)
 		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
 		cls.c = cls.conn.cursor()
 		print('\r', end='', flush=True)
-		print('\033[0;32mSqlite database initialized.\033[0m', flush=True)
-
+		print('\033[0;32mDatabase {} initialized.\033[0m'.format(name), flush=True)
 	@classmethod
-	def disconnect(cls):
+	def disconnect(cls, name: str):
+		"""
+		断开数据库文件连接，注意：这是一个类方法！
+		"""
+		raise SyntaxError
 		cls.conn.close()
-
-	def get_list(self):
-		PLAYER_LIST = []
-		cursor = self.c.execute("SELECT * from `playerInfo-{}`".format(self.group_id))
-		for row in cursor:
-			player_obj = Player(short_steamID=row[0],
-								long_steamID=row[1],
-								nickname=row[2],
-								qqid=row[3],
-								last_DOTA2_match_ID=row[4])
-			PLAYER_LIST.append(player_obj)
-		return PLAYER_LIST
-
-	def update_DOTA2_match_ID(self, short_steamID, last_DOTA2_match_ID):
-		self.c.execute("UPDATE `playerInfo-{}` SET last_DOTA2_match_ID='{}' "
-				"WHERE short_steamID={}".format(self.group_id, last_DOTA2_match_ID, short_steamID))
-		self.conn.commit()
-
-	def insert_info(self, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID):
-		self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
-				"VALUES ({}, {}, {}, '{}', '{}')"
-				.format(self.group_id, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
-		self.conn.commit()
-
-	def delete_info(self, short_steamID):
-		self.c.execute("DELETE FROM `playerInfo-{}` WHERE short_steamID={}".format(self.group_id, short_steamID))
-		self.conn.commit()
-
-	def is_player_stored(self, short_steamID: int) -> bool:
-		self.c.execute("SELECT * FROM `playerInfo-{}` WHERE short_steamID=={}".format(self.group_id, short_steamID))
-		if len(self.c.fetchall()) == 0:
-			return False
-		return True
+		print('{} Closed.'.format(name))

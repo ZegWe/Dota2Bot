@@ -18,7 +18,7 @@ class MsgSender:
 		return tmp
 
 	def send(self):
-		pass
+		print("Could not send message, You should implement this method yourself")
 
 class GroupSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
@@ -54,7 +54,7 @@ class FriendSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
 		super().__init__(url, qid, to)
 		self._data = {
-				"ToUserUid": self.too,
+				"ToUserUid": self.to,
 				"SendToType": 1,
 				"SendMsgType": "TextMsg",
 				"Content": ""

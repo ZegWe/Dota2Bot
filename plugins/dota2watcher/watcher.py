@@ -1,7 +1,8 @@
+from asyncio.events import AbstractEventLoop
 import time
 import json
 from model.player import Player
-from model.db import DB
+from .DotaDB import DotaDB as DB
 from model.message_sender import GroupSender
 from model.plugin import Plugin
 from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, generate_solo_message, steam_id_convert_32_to_64
@@ -11,7 +12,7 @@ import re
 from threading import Thread
 
 
-def start_loop(loop):
+def start_loop(loop: AbstractEventLoop):
 	asyncio.set_event_loop(loop)
 	loop.run_forever()
 
@@ -27,19 +28,36 @@ class Watcher(Plugin):
 		self.result = {}
 		self.PLAYER_LIST = self.db.get_list()
 		for player in self.PLAYER_LIST:
-			player = self._update_player(player)
+			player = self.update_player(player)
 		self.running = True
 		print('initializing group({})'.format(group_id))
-		loop = asyncio.new_event_loop()
-		Thread(target=start_loop, args=(loop,)).start()
-		asyncio.run_coroutine_threadsafe(self._update(), loop)
+		self.loop = asyncio.new_event_loop()
+		Thread(target=start_loop, args=(self.loop,)).start()
+		asyncio.run_coroutine_threadsafe(self._update(), self.loop)
+
+	def update_player(self, player: Player):
+		try:
+			match_id = get_last_match_id_by_short_steamID(player.short_steamID)
+		except Exception:
+			print(Exception)
+			return player
+		if match_id != player.last_DOTA2_match_ID:
+			if self.result.get(match_id, 0) != 0:
+				self.result[match_id].append(player)
+			else:
+				self.result.update({match_id: [player]})
+			
+			self.db.update_DOTA2_match_ID(player.short_steamID, match_id)
+			player.last_DOTA2_match_ID = match_id
+		return player
+
 
 	async def _update_player(self, player: Player):
 		try:
 			match_id = get_last_match_id_by_short_steamID(player.short_steamID)
 		except Exception:
 			print(Exception)
-			return
+			return player
 		if match_id != player.last_DOTA2_match_ID:
 			if self.result.get(match_id, 0) != 0:
 				self.result[match_id].append(player)
@@ -71,11 +89,9 @@ class Watcher(Plugin):
 			time.sleep((24 * 60 * 60) / (100000 / (2 * len(self.PLAYER_LIST))))
 		print('Watching Loop exited: {}'.format(self.group_id))
 
-	def Set(self, on: bool):
-		self._on = on
-
 	def shutdown(self):
 		self.running = False
+		self.loop.stop()
 		super().shutdown()
 
 	def add_watch(self, nickname, shortID, qqid):
@@ -96,6 +112,7 @@ class Watcher(Plugin):
 		except Exception as e:
 			print('Remove Watch Error Index: {}'.format(e))
 			self.sender.send('请输入正确的序号！')
+			return
 		try:
 			if self.db.is_player_stored(shortID):
 				self.db.delete_info(shortID)
@@ -150,4 +167,4 @@ class Watcher(Plugin):
 
 def test():
 	Config.Load('./config.json')
-	DB.connect('playerInfo.db')
+	DB.connect('playerInfo.db', )

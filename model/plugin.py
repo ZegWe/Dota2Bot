@@ -1,10 +1,9 @@
 from .message_sender import GroupSender
-import Config
-import re
 
 class Plugin(object):
 	"""
-	Plugin Base Class
+	Plugin Base Class;
+	Could not be used directly
 	"""
 	__name = ""
 	def __init__(self, group_id: int, sender: GroupSender):
