@@ -139,3 +139,4 @@ config.json
 
 # db
 playerInfo.db
+pluginInfo.db
