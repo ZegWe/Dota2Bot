@@ -17,7 +17,7 @@ def connect():
 
 @sio.event
 def OnGroupMsgs(data):
-	print(threading.currentThread())
+	# print(threading.currentThread())
 	message_data = data['CurrentPacket']['Data']
 	from_group = message_data['FromGroupId']
 	if from_group not in managers:
@@ -45,10 +45,9 @@ def init():
 	for group in Config.groups:
 		managers[group] = PluginManager(group)
 		managers[group].add_plugin('DOTA2战绩播报', True)
-	print('Pulgin Manager initialized.')
 
 if __name__ == "__main__":
-	print(threading.currentThread())
+	# print(threading.currentThread())
 	init()
 	print('Connecting to server...', end='', flush=True)
 	sio.connect(Config.sio_url, transports=['websocket'])

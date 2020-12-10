@@ -39,13 +39,14 @@ class GroupSender(MsgSender):
 			}
 
 	def send(self, message: str):
+		send_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + 8*60*60))
 		if time.time() - self.get_last_time() < 1.1:
 			time.sleep(1.1 - time.time() + self.get_last_time())
 		try:
 			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			if json.loads(r.text).get('Ret') == 241:
-				print("message sending failed, resending now...")
+				print("{}: message sending failed, resending now...".format(send_time))
 				print(r.text)
 				time.sleep(0.5)
 				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
@@ -55,10 +56,10 @@ class GroupSender(MsgSender):
 				print("message sending failed.")
 				print(r.text)
 				return
-			print("message sending succeeded")
+			print("{}: message sending succeeded".format(send_time))
 		except Exception as e:
 			print(e)
-			print("post request error")
+			print("{}: post request error".format(send_time))
 
 class FriendSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):

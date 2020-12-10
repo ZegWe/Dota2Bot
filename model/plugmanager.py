@@ -20,6 +20,7 @@ class PluginManager(object):
 			new_plugin : Plugin = PLUGIN_DICT[plugin_name](group_id, self.sender)
 			new_plugin.Set(pluginlist[plugin_name])
 			self.plugins.append(new_plugin)
+		print('Plugin Manager({}) Initialized.'.format(group_id))
 
 	def handle(self, data: dict):
 		m = data['Content']
@@ -57,7 +58,7 @@ class PluginManager(object):
 		if PLUGIN_DICT.get(plugin_name, 0) == 0:
 			return
 		for plugin in self.plugins:
-			print(plugin_name, plugin.get_name())
+			# print(plugin_name, plugin.get_name())
 			if plugin.get_name() == plugin_name:
 				return
 		new_plugin = PLUGIN_DICT[plugin_name](self.group_id,self.sender)
