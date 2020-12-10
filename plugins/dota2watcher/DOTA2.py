@@ -108,7 +108,6 @@ def generate_party_message(match_id: int, player_list: List[Player]) -> list:
 				i.dota2_death = j['deaths']
 				i.dota2_assist = j['assists']
 				i.kda = ((1. * i.dota2_kill + i.dota2_assist) / i.dota2_death) if i.dota2_death != 0 else (1. * i.dota2_kill + i.dota2_assist)
-
 				i.dota2_team = get_team_by_slot(j['player_slot'])
 				i.hero = int(j['hero_id'])
 				i.last_hit = j['last_hits']

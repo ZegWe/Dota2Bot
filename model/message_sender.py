@@ -5,17 +5,25 @@ import requests
 import time
 
 class MsgSender:
+	__last_time : float = 0
 	def __init__(self, url: str, qid: int, to: int):
 		self.url: str = url
 		self.qid: int = qid
-		self.to:int = to
-		self.last_send_time:float = 0
+		self.to: int = to
 		self._data: dict = {}
 
 	def _get_data(self, message: str) -> dict:
 		tmp = self._data
 		tmp["Content"] = message
 		return tmp
+
+	@classmethod
+	def get_last_time(cls):
+		return cls.__last_time
+
+	@classmethod
+	def set_last_time(cls, time: float):
+		cls.__last_time = time
 
 	def send(self):
 		print("Could not send message, You should implement this method yourself")
@@ -31,15 +39,17 @@ class GroupSender(MsgSender):
 			}
 
 	def send(self, message: str):
-		if time.time() - self.last_send_time < 1.1:
-			time.sleep(1.1 - time.time() + self.last_send_time)
+		if time.time() - self.get_last_time() < 1.1:
+			time.sleep(1.1 - time.time() + self.get_last_time())
 		try:
 			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			if json.loads(r.text).get('Ret') == 241:
+				print("message sending failed, resending now...")
+				print(r.text)
 				time.sleep(0.5)
 				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
-			last_send_time = time.time()
+			self.set_last_time(time.time())
 			print(data)
 			if json.loads(r.text).get('Ret') != 0:
 				print("message sending failed.")
@@ -62,11 +72,11 @@ class FriendSender(MsgSender):
 
 	def sendGroup(self, message: str):
 		data = self._get_data(message)
-		if time.time() - self.last_send_time < 1.1:
-			time.sleep(1.1 - time.time() + self.last_send_time)
+		if time.time() - self.get_last_time() < 1.1:
+			time.sleep(1.1 - time.time() + self.get_last_time())
 		try:
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
-			last_send_time = time.time()
+			self.set_last_time(time.time())
 			print(data)
 			if json.loads(r.text).get('Ret') != 0:
 				print("message sending failed.")
