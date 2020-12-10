@@ -1,5 +1,7 @@
 # DOTA2BOT for QQ
 
+# This branch has been despatched, please switch to branch `new`
+
 ## Introduction
 
 ## Quick start
