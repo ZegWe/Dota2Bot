@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is OPQ based QQbot for watching group member's Dota2 game record.
+This is [OPQ](https://github.com/OPQBOT/OPQ) based QQbot for watching group member's Dota2 game record.
 
 This bot also integrates a plugin manager system, you can develop any plugin you want.
 
