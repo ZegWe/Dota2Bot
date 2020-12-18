@@ -116,12 +116,6 @@ cp config.example.json config.json
 vim config.json
 ```
 
-Create `pluginInfo.db` and `playerInfo.db` file.
-```bash
-touch playerInfo.db
-touch pluginInfo.db
-```
-
 Run with Python directly
 ```bash
 pip install -r requirements.txt
