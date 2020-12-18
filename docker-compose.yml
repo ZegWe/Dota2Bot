@@ -2,7 +2,7 @@ version: '3.0'
 services: 
   dota2_bot: 
     build: .
-    ports:
-        - host
     volumes:
-      - ${PWD}/config.json:/opt/dota2bot/config.json
+      - ${PWD}/config.json:/opt/bot/config.json
+      - ${PWD}/pluginInfo.db:/opt/bot/pluginInfo.db
+      - ${PWD}/playerInfo.db:/opt/bot/playerInfo.db

@@ -35,12 +35,19 @@ Install and run [OPQ](https://github.com/OPQBOT/OPQ)
 Install [Docker](https://docs.docker.com/engine/install/)
 
 ### Run
+
+You can [run python command directly](#run-python-directly) to debug, but **I strongly suggest you to use docker**, because it's better to run this bot in background.
+
+You can [pull docker image from DockerHub](#use-dockerhub) or [build your own image from this repo](#use-git).
+
+#### Use dockerhub
+
 Pull docker image from [DockerHub](https://hub.docker.com/r/zegwe/dota2bot)
 ```bash
 docker pull zegwe/dota2bot:latest
 ```
 
-Create `playerInfo.db` and `pluginInfo.db` file.
+Create `pluginInfo.db` and `playerInfo.db` file.
 ```bash
 mkdir Dota2Bot
 cd Dota2Bot
@@ -68,4 +75,55 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 Run with `Docker`.
 ```bash
 docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/playerInfo.db:/opt/dota2bot/playerInfo.db -v $(pwd)/pluginInfo.db:/opt/dota2bot/pluginInfo.db --name dota2bot zegwe/dota2bot:latest
+```
+
+#### Use git
+
+Clone this repo
+```bash
+git clone https://github.com/ZegWe/Dota2Bot.git
+```
+
+Edit `config.json`
+```bash
+cd Dota2Bot
+cp config.example.json config.json
+vim config.json
+```
+
+Create `pluginInfo.db` and `playerInfo.db` file.
+```bash
+touch playerInfo.db
+touch pluginInfo.db
+```
+
+Run with `docker-compose`
+```bash
+docker-compose up -d
+```
+
+#### Run python directly
+
+Clone this repo
+```bash
+git clone https://github.com/ZegWe/Dota2Bot.git
+```
+
+Edit `config.json`
+```bash
+cd Dota2Bot
+cp config.example.json config.json
+vim config.json
+```
+
+Create `pluginInfo.db` and `playerInfo.db` file.
+```bash
+touch playerInfo.db
+touch pluginInfo.db
+```
+
+Run with Python directly
+```bash
+pip install -r requirements.txt
+python app.py
 ```
