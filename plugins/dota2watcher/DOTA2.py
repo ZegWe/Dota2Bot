@@ -257,13 +257,13 @@ def generate_solo_message(match_id: int, player_obj: Player) -> list:
 			postive = False
 	print_str = ""
 	if win and postive:
-		print_str += random.choice(WIN_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
+		print_str += random.choice(WIN_POSTIVE_SOLO).format(player_obj.nickname) + '\n'
 	elif win and not postive:
-		print_str += random.choice(WIN_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
+		print_str += random.choice(WIN_NEGATIVE_SOLO).format(player_obj.nickname) + '\n'
 	elif not win and postive:
-		print_str += random.choice(LOSE_POSTIVE_PARTY).format(player_obj.nickname) + '\n'
+		print_str += random.choice(LOSE_POSTIVE_SOLO).format(player_obj.nickname) + '\n'
 	else:
-		print_str += random.choice(LOSE_NEGATIVE_PARTY).format(player_obj.nickname) + '\n'
+		print_str += random.choice(LOSE_NEGATIVE_SOLO).format(player_obj.nickname) + '\n'
 
 	start_time = time.strftime(
 		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']+8*60*60))
