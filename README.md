@@ -32,13 +32,13 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 
 Install and run [OPQ](https://github.com/OPQBOT/OPQ)
 
-Install [Docker](https://docs.docker.com/engine/install/) or Python, watch details below.
+Install [Docker](https://docs.docker.com/engine/install/) or Python, see the details below.
 
 ### [Run](#run)
 
-You can [run python command directly](#run-python-directly) to debug, but **I strongly suggest you to use docker**, because it's better to run this bot in background.
+You can [run python command directly](#run-python-directly) for debug, but **I strongly suggest you to use docker**, because it's better to run this bot in background.
 
-You can [pull docker image from DockerHub](#use-dockerhub) or [build your own image from this repo](#use-git).
+Using docker, you can [pull docker image from DockerHub](#use-dockerhub) or [build your own image from this repo](#use-git).
 
 #### [Use dockerhub](#use-dockerhub)
 
