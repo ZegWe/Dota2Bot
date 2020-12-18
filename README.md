@@ -1,16 +1,16 @@
 # DOTA2BOT for QQ
 
-## Introduction
+## [Introduction](#introduction)
 
 This is [OPQ](https://github.com/OPQBOT/OPQ) based QQbot for watching group member's Dota2 game record.
 
-This bot also integrates a plugin manager system, you can develop any plugin you want.
+This bot also integrates a plugin manage system, you can develop any plugin you want.
 
-## Usage
+## [Usage](#usage)
 
-> Notice: All the command are insensitive to half-width `!` and full-width `！`
+> Notice: All the command are insensitive to half-width `!` and full-width `！`.
 
-### Plugin Manager
+### [Plugin Manage](#plugin-manage)
 
 `!插件列表`: List all the plugins and their status(On or Off). Now it only support one plugin named [`Dota2Watcher`](), which is described below, but you can develop your own one.
 
@@ -18,7 +18,7 @@ This bot also integrates a plugin manager system, you can develop any plugin you
 
 `!禁用插件 [index]`: Disable a plugin by its `index` in the list
 
-### Dota2Watcher
+### [Dota2Watcher](#dota2watcher)
 
 `!查看监视`: List all the players that is been watched.
 
@@ -26,21 +26,21 @@ This bot also integrates a plugin manager system, you can develop any plugin you
 
 `!移除监视 [index]`: Remove a player from the watching list by its `index`
 
-## Quick start
+## [Quick start](#quick-start)
 
-### Prepare
+### [Prepare](#prepare)
 
 Install and run [OPQ](https://github.com/OPQBOT/OPQ)
 
-Install [Docker](https://docs.docker.com/engine/install/)
+Install [Docker](https://docs.docker.com/engine/install/) or Python, watch details below.
 
-### Run
+### [Run](#run)
 
 You can [run python command directly](#run-python-directly) to debug, but **I strongly suggest you to use docker**, because it's better to run this bot in background.
 
 You can [pull docker image from DockerHub](#use-dockerhub) or [build your own image from this repo](#use-git).
 
-#### Use dockerhub
+#### [Use dockerhub](#use-dockerhub)
 
 Pull docker image from [DockerHub](https://hub.docker.com/r/zegwe/dota2bot)
 ```bash
@@ -77,7 +77,7 @@ Run with `Docker`.
 docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/playerInfo.db:/opt/dota2bot/playerInfo.db -v $(pwd)/pluginInfo.db:/opt/dota2bot/pluginInfo.db --name dota2bot zegwe/dota2bot:latest
 ```
 
-#### Use git
+#### [Use git](#use-git)
 
 Clone this repo
 ```bash
@@ -102,7 +102,7 @@ Run with `docker-compose`
 docker-compose up -d
 ```
 
-#### Run python directly
+#### [Run python directly](#run-python-directly)
 
 Clone this repo
 ```bash
