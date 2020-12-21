@@ -1,6 +1,6 @@
 # DOTA2BOT for QQ
 
-# This branch has been despatched, please switch to branch `new`
+# This branch has been deprecated, please switch to branch `new`
 
 ## Introduction
 
