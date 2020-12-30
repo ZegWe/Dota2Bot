@@ -13,7 +13,8 @@ managers = {}
 
 @sio.event
 def connect():
-    print('\rConnection established.', flush=True)
+	sio.emit('GetWebConn', Config.bot_id)
+	print('\rConnection established.', flush=True)
 
 @sio.event
 def OnGroupMsgs(data):
