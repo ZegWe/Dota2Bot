@@ -3,7 +3,6 @@ import argparse
 import Config
 from model.plugmanager import PluginManager, PluginDB
 from plugins.dota2watcher.DotaDB import DotaDB
-import time
 
 sio = socketio.Client()
 managers = {}
@@ -50,9 +49,6 @@ if __name__ == "__main__":
 	print('Connecting to server...', end='', flush=True)
 	sio.connect(Config.sio_url, transports=['websocket'])
 	try:
-		while(True):
-			sio.sleep(60)
-			sio.emit('GetWebConn', Config.bot_id)
 		sio.wait()
 	except KeyboardInterrupt:
 		for group in managers:
