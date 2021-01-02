@@ -54,7 +54,7 @@ class DotaDB():
 
 		$return: 数据库中的player列表
 		"""
-		PLAYER_LIST : List[Player]= []
+		playerList : List[Player]= []
 		cursor = self.c.execute("SELECT * from `playerInfo-{}`".format(self.group_id))
 		for row in cursor:
 			player_obj = Player(short_steamID=row[0],
@@ -62,22 +62,40 @@ class DotaDB():
 								nickname=row[2],
 								qqid=row[3],
 								last_DOTA2_match_ID=row[4])
-			PLAYER_LIST.append(player_obj)
-		return PLAYER_LIST
+			playerList.append(player_obj)
+		return playerList
 
 	def update_DOTA2_match_ID(self, short_steamID, last_DOTA2_match_ID):
-		self.c.execute("UPDATE `playerInfo-{}` SET last_DOTA2_match_ID='{}' "
-				"WHERE short_steamID={}".format(self.group_id, last_DOTA2_match_ID, short_steamID))
+		for _ in range(3):
+			try:
+				self.c.execute("UPDATE `playerInfo-{}` SET last_DOTA2_match_ID='{}' "
+					"WHERE short_steamID={}".format(self.group_id, last_DOTA2_match_ID, short_steamID))
+			except Exception:
+				print(Exception)
+			else:
+				break
 		self.conn.commit()
 
 	def insert_info(self, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID):
-		self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
-				"VALUES ({}, {}, {}, '{}', '{}')"
-				.format(self.group_id, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
+		for _ in range(3):
+			try:
+				self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
+					"VALUES ({}, {}, {}, '{}', '{}')"
+					.format(self.group_id, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
+			except Exception:
+				print(Exception)
+			else:
+				break
 		self.conn.commit()
 
 	def delete_info(self, short_steamID):
-		self.c.execute("DELETE FROM `playerInfo-{}` WHERE short_steamID={}".format(self.group_id, short_steamID))
+		for _ in range(3):
+			try:
+				self.c.execute("DELETE FROM `playerInfo-{}` WHERE short_steamID={}".format(self.group_id, short_steamID))
+			except Exception:
+				print(Exception)
+			else:
+				break
 		self.conn.commit()
 
 	def is_player_stored(self, short_steamID: int) -> bool:
