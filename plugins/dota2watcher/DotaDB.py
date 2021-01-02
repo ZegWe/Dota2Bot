@@ -70,8 +70,8 @@ class DotaDB():
 			try:
 				self.c.execute("UPDATE `playerInfo-{}` SET last_DOTA2_match_ID='{}' "
 					"WHERE short_steamID={}".format(self.group_id, last_DOTA2_match_ID, short_steamID))
-			except Exception:
-				print(Exception)
+			except Exception as e:
+				print(repr(e))
 			else:
 				break
 		self.conn.commit()
@@ -82,8 +82,8 @@ class DotaDB():
 				self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
 					"VALUES ({}, {}, {}, '{}', '{}')"
 					.format(self.group_id, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
-			except Exception:
-				print(Exception)
+			except Exception as e:
+				print(repr(e))
 			else:
 				break
 		self.conn.commit()
@@ -92,8 +92,8 @@ class DotaDB():
 		for _ in range(3):
 			try:
 				self.c.execute("DELETE FROM `playerInfo-{}` WHERE short_steamID={}".format(self.group_id, short_steamID))
-			except Exception:
-				print(Exception)
+			except Exception as e:
+				print(repr(e))
 			else:
 				break
 		self.conn.commit()

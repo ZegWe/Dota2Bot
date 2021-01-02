@@ -36,8 +36,8 @@ class Watcher(Plugin):
 		# print(time.time())
 		try:
 			match_id = get_last_match_id_by_short_steamID(player.short_steamID)
-		except Exception:
-			print(Exception)
+		except Exception as e:
+			print(repr(e))
 			return player
 		if match_id != player.last_DOTA2_match_ID:
 			if self.result.get(match_id, 0) != 0:
@@ -95,7 +95,7 @@ class Watcher(Plugin):
 		try:
 			shortID = self.playerList[index - 1].short_steamID
 		except Exception as e:
-			print('Remove Watch Error Index: {}'.format(e))
+			print('Remove Watch Error Index: {}'.format(repr(e)))
 			self.sender.send('请输入正确的序号！')
 			return
 		try:
@@ -103,7 +103,7 @@ class Watcher(Plugin):
 				self.db.delete_info(shortID)
 			del self.playerList[index - 1]
 		except Exception as e:
-			print('Remove Watch Error: {}'.format(e))
+			print('Remove Watch Error: {}'.format(repr(e)))
 			self.sender.send('移除监视失败！')
 		else:
 			print('Remove Watch Successfully!')
@@ -133,7 +133,7 @@ class Watcher(Plugin):
 				index = int(re.split(r'\s+', s)[1])
 				self.remove_watch(index)
 			except Exception as e:
-				print('Remove Watch Error Argument: {}'.format(e))
+				print('Remove Watch Error Argument: {}'.format(repr(e)))
 				self.sender.send('请输入正确的参数！')
 			finally: return True
 		elif re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m):
@@ -144,7 +144,7 @@ class Watcher(Plugin):
 				# print(nickname, steamID, qqid)
 				self.add_watch(nickname, int(steamID), int(qqid))
 			except Exception as e:
-				print('Add Watch Error Argument: {}'.format(e))
+				print('Add Watch Error Argument: {}'.format(repr(e)))
 				self.sender.send('请输入正确的参数！')
 			finally: return True
 

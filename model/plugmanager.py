@@ -79,7 +79,7 @@ class PluginManager(object):
 			self.plugins[index - 1].Set(True)
 			self.db.update_info(self.plugins[index-1].get_name(), True)
 		except Exception as e:
-			print('Enable Plugin Failed: {}'.format(e))
+			print('Enable Plugin Failed: {}'.format(repr(repr(e))))
 			self.sender.send('启用插件失败！')
 		else:
 			print('Plugin {} Enabled!'.format(self.plugins[index - 1].get_name()))

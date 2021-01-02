@@ -58,7 +58,7 @@ class GroupSender(MsgSender):
 				return
 			print("{}: message sending succeeded".format(send_time))
 		except Exception as e:
-			print(e)
+			print(repr(e))
 			print("{}: post request error".format(send_time))
 
 class FriendSender(MsgSender):
@@ -85,5 +85,5 @@ class FriendSender(MsgSender):
 				return
 			print("message sending succeeded")
 		except Exception as e:
-			print(e)
+			print(repr(e))
 			print("post request error")
