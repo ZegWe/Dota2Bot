@@ -3,12 +3,14 @@
 from os import error
 import sqlite3
 from .player import Player
+import threading
 
 class BaseDB:
 	"""
 	基于sqlite封装的数据库对象
 	所有实例共用同一个数据库文件，根据不同群号来区分不同表
 	已封装connect和disconnect函数
+	使用数据库时请务必加上线程锁
 	"""
 	def __init__(self, group_id: int):
 		raise SyntaxError

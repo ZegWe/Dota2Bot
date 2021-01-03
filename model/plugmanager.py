@@ -1,3 +1,5 @@
+import threading
+from model.db import BaseDB
 from model.plugin import Plugin
 import re
 import Config
@@ -101,7 +103,7 @@ class PluginManager(object):
 			plugin.shutdown()
 		print('manager({}) shutdown'.format(self.group_id))
 
-class PluginDB():
+class PluginDB(BaseDB):
 	"""
 	存储插件信息的数据库
 	"""
@@ -126,6 +128,7 @@ class PluginDB():
 		print('Initializing {}...'.format(cls.__name), end='', flush=True)
 		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
 		cls.c = cls.conn.cursor()
+		cls.lock = threading.Lock()
 		print('\r', end='', flush=True)
 		print('\033[0;32mDatabase {} initialized.\033[0m'.format(cls.__name), flush=True)
 
@@ -143,18 +146,23 @@ class PluginDB():
 
 	def get_list(self):
 		plugindict : Dict[str, bool] = {}
+		self.lock.acquire()
 		cursor = self.c.execute('SELECT * FROM `pluginInfo-{}`'.format(self.group_id))
 		for row in cursor:
 			plugindict.update({row[0]: row[1]})
+		self.lock.release()
 		return plugindict
 
 	def insert_info(self, plugin_name: str, status: bool):
-		com = "INSERT INTO `pluginInfo-{}` (plugin_name, status) \
-				VALUES ('{}', {})".format(self.group_id, plugin_name, status)
-		self.c.execute(com)
+		self.lock.acquire()
+		self.c.execute("INSERT INTO `pluginInfo-{}` (plugin_name, status) VALUES ('{}', {})"
+			.format(self.group_id, plugin_name, status))
 		self.conn.commit()
+		self.lock.acquire()
 
 	def update_info(self, plugin_name: str, status: bool):
+		self.lock.acquire()
 		self.c.execute("UPDATE `pluginInfo-{}` SET status={} WHERE plugin_name='{}'"
 			.format(self.group_id, status, plugin_name))
 		self.conn.commit()
+		self.lock.release()
