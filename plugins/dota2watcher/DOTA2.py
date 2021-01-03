@@ -29,29 +29,36 @@ def get_team_by_slot(slot: int) -> int:
 
 def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
     # get match_id
-    url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v001/?key={}' \
+	url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v001/?key={}' \
           '&account_id={}&matches_requested=1'.format(Config.api_key, short_steamID)
-    try:
-        response = requests.get(url)
-    except requests.RequestException:
-        raise DOTA2HTTPError("Requests Error")
-    if response.status_code >= 400:
-        if response.status_code == 401:
-            raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
-        if response.status_code == 503:
-            raise DOTA2HTTPError(
-                "The server is busy or you exceeded limits. Please wait 30s and try again.")
-        raise DOTA2HTTPError(
-            "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
+	try:
+		response = requests.get(url)
+	except requests.RequestException:
+		raise DOTA2HTTPError("Requests Error")
+	if response.status_code == 429:
+		try:
+			response = requests.get(url)
+		except requests.RequestException:
+			raise DOTA2HTTPError("Requests Error")
+	if response.status_code >= 400:
+		if response.status_code == 401:
+			raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
+		if response.status_code == 429:
+			raise DOTA2HTTPError('429 Too Many Requests!')
+		if response.status_code == 503:
+			raise DOTA2HTTPError(
+				"The server is busy or you exceeded limits. Please wait 30s and try again.")
+		raise DOTA2HTTPError(
+			"Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
 
-    match = response.json()
-    try:
-        match_id = match["result"]["matches"][0]["match_id"]
-    except KeyError:
-        raise DOTA2HTTPError("Response Error: Key Error")
-    except IndexError:
-        raise DOTA2HTTPError("Response Error: Index Error")
-    return match_id
+	match = response.json()
+	try:
+		match_id = match["result"]["matches"][0]["match_id"]
+	except KeyError:
+		raise DOTA2HTTPError("Response Error: Key Error")
+	except IndexError:
+		raise DOTA2HTTPError("Response Error: Index Error")
+	return match_id
 
 
 def get_match_detail_info(match_id: int) -> dict:
