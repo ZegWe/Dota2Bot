@@ -1,5 +1,5 @@
 from .dota2watcher import Dota2Watcher
-from .fortune import Fortune
+from .dota2fortune import Fortune
 
 PLUGIN_DICT : dict = {
 	Dota2Watcher.get_name() : Dota2Watcher,
