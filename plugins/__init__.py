@@ -1,5 +1,7 @@
 from .dota2watcher import Dota2Watcher
+from .fortune import Fortune
 
 PLUGIN_DICT : dict = {
-	'DOTA2战绩播报': Dota2Watcher
+	Dota2Watcher.get_name() : Dota2Watcher,
+	Fortune.get_name() : Fortune
 }

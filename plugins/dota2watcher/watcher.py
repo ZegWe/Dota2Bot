@@ -14,7 +14,7 @@ class Watcher(Plugin):
 	Dota2战绩自动查询插件
 	"""
 	
-	_Plugin__name = "DOTA2战绩播报"
+	__name = "DOTA2战绩播报"
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__(group_id, sender)
 		self.db = DB(group_id)
@@ -31,6 +31,9 @@ class Watcher(Plugin):
 		t = self.pool.submit(self.update)
 		print('Dota2 Watcher({}) initialized.'.format(group_id))
 
+	@classmethod
+	def get_name(cls):
+		return cls.__name
 
 	def update_player(self, player: Player) -> Player:
 		# print(time.time())
@@ -123,7 +126,8 @@ class Watcher(Plugin):
 		if len(m):
 			self.sender.send(m)
 
-	def handle(self, m: str) -> bool:
+	def handle(self, data: dict) -> bool:
+		m = data['Content']
 		if re.match(r'^[！!]查看监视$', m):
 			self.show_watch()
 			return True

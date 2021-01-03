@@ -5,7 +5,7 @@ class Plugin(object):
 	Plugin Base Class;
 	Could not be used directly
 	"""
-	__name = ""
+	__name = "PluginBaseClass"
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__()
 		self.group_id = group_id
@@ -25,5 +25,5 @@ class Plugin(object):
 	def shutdown(self):
 		print('plugin {} shutdown'.format(self.get_name()))
 
-	def handle(self, data: str):
+	def handle(self, data: dict):
 		pass

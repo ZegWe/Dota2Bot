@@ -3,9 +3,10 @@ import argparse
 import Config
 from model.plugmanager import PluginManager, PluginDB
 from plugins.dota2watcher.DotaDB import DotaDB
+from typing import Dict
 
 sio = socketio.Client()
-managers = {}
+managers : Dict[int, PluginManager] = {}
 
 @sio.event
 def connect():
@@ -42,6 +43,7 @@ def init():
 	for group in Config.groups:
 		managers[group] = PluginManager(group)
 		managers[group].add_plugin('DOTA2战绩播报', True)
+		managers[group].add_plugin('DOTA2每日运势', True)
 
 if __name__ == "__main__":
 	# print(threading.currentThread())

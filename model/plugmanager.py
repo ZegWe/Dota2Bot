@@ -48,7 +48,7 @@ class PluginManager(object):
 		else:
 			for plugin in self.plugins:
 				if plugin.On():
-					if plugin.handle(m):
+					if plugin.handle(data):
 						return
 		if re.match(r'^[!！]', m):
 			self.sender.send('未找到此命令！')
