@@ -1,5 +1,19 @@
 # DOTA2BOT for QQ
 
+- [DOTA2BOT for QQ](#dota2bot-for-qq)
+	- [Introduction](#introduction)
+	- [Usage](#usage)
+		- [Plugin Manage](#plugin-manage)
+		- [Dota2Watcher](#dota2watcher)
+		- [Dota2Fortune](#dota2fortune)
+	- [Quick start](#quick-start)
+		- [Prepare](#prepare)
+		- [Run](#run)
+			- [Use dockerhub](#use-dockerhub)
+			- [Use git](#use-git)
+			- [Run python directly](#run-python-directly)
+	- [Develop your plugin](#develop-your-plugin)
+
 ## [Introduction](#introduction)
 
 This is [OPQ](https://github.com/OPQBOT/OPQ) based QQbot for watching group member's Dota2 game record.
@@ -75,7 +89,7 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 	"api_key": "xxxxx",
 	"bot_qq": 1234567890,
 	"admin_qq": 1234567890,
-	"groups": [1234567890], // this is a list of all the groups that you want to enable bot in
+	"groups": [1234567890],
 	"opq_url": "http://127.0.0.1:8080/v1/LuaApiCaller",
 	"ws_url": "http://127.0.0.1:8080"
 }
