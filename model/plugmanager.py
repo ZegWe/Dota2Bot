@@ -5,7 +5,6 @@ import re
 import Config
 from plugins import PLUGIN_DICT
 from .message_sender import GroupSender
-from typing import List, Dict
 import sqlite3
 
 class PluginManager(object):
@@ -13,8 +12,8 @@ class PluginManager(object):
 	Plugin Manager
 	"""
 	def __init__(self, group_id: int):
-		self.group_id = group_id
-		self.plugins: List[Plugin] = []
+		self.group_id : int = group_id
+		self.plugins: list[Plugin] = []
 		self.sender = GroupSender(Config.post_url, Config.bot_id, group_id)
 		self.db = PluginDB(group_id)
 		pluginlist = self.db.get_list()
@@ -141,11 +140,11 @@ class PluginDB(BaseDB):
 		print('{} Closed.'.format(name))
 
 	@classmethod
-	def get_name(cls):
+	def get_name(cls) -> str:
 		return cls.__name
 
-	def get_list(self):
-		plugindict : Dict[str, bool] = {}
+	def get_list(self) -> dict[str, bool]:
+		plugindict : dict[str, bool] = {}
 		self.lock.acquire()
 		cursor = self.c.execute('SELECT * FROM `pluginInfo-{}`'.format(self.group_id))
 		for row in cursor:

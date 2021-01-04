@@ -1,3 +1,4 @@
+pytz
 requests
 python-socketio
 websocket-client

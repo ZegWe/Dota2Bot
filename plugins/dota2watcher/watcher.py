@@ -1,3 +1,4 @@
+from concurrent import futures
 import time
 from model.player import Player
 from .DotaDB import DotaDB as DB
@@ -6,7 +7,6 @@ from model.plugin import Plugin
 from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, generate_solo_message, steam_id_convert_32_to_64
 import Config
 import re
-from typing import List
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class Watcher(Plugin):
@@ -20,7 +20,7 @@ class Watcher(Plugin):
 		self.db = DB(group_id)
 		self.result = {}
 		self.pool = ThreadPoolExecutor(20)
-		self.playerList : List[Player] = []
+		self.playerList : list[Player] = []
 		tmpList = self.db.get_list()
 		taskList = []
 		for player in tmpList:
@@ -60,7 +60,7 @@ class Watcher(Plugin):
 				time.sleep(5)
 				continue
 			if self.On():
-				taskList : List = []
+				taskList : list = []
 				for player in self.playerList:
 					taskList.append(self.pool.submit(self.update_player, player))
 				self.playerList.clear()

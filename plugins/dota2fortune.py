@@ -1,10 +1,9 @@
 from model.plugin import Plugin
 from model.message_sender import GroupSender
 import re
-from typing import Dict, List
 import random
 
-fortuneDict : Dict[str, List[str]] = {
+fortuneDict : dict[str, list[str]] = {
 	'大吉': [
 		'今日宜上分，有果皇带躺',
 		'今日宜玩果虚空，果皇附体，神勇无敌'
@@ -34,10 +33,10 @@ class Fortune(Plugin):
 		super().__init__(group_id, sender)
 
 	@classmethod
-	def get_name(cls):
+	def get_name(cls) -> str:
 		return cls.__name
 	
-	def handle(self, data: dict):
+	def handle(self, data: dict) -> bool:
 		m = data['Content']
 		if re.match(r'^[！!]今日运势$', m):
 			message = self.get_fortune(data['FromUserId'])

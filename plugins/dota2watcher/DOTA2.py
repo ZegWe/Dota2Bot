@@ -3,10 +3,9 @@
 import requests
 from .DOTA2_dicts import *
 from model.player import Player
+import pytz, datetime
 import random
-import time
 import Config
-from typing import List
 
 # 异常处理
 class DOTA2HTTPError(Exception):
@@ -25,7 +24,6 @@ def get_team_by_slot(slot: int) -> int:
         return 1
     else:
         return 2
-
 
 def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
     # get match_id
@@ -91,7 +89,7 @@ def get_match_detail_info(match_id: int) -> dict:
 
 # 接收某局比赛的玩家列表, 生成开黑战报
 # 参数为玩家对象列表和比赛ID
-def generate_party_message(match_id: int, player_list: List[Player]) -> list:
+def generate_party_message(match_id: int, player_list: list[Player]) -> list[str]:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
@@ -173,11 +171,10 @@ def generate_party_message(match_id: int, player_list: List[Player]) -> list:
 	else:
 		print_str = random.choice(LOSE_NEGATIVE_PARTY).format(print_str) + '\n'
 
-	start_time = time.strftime(
-		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time'] + 8*60*60))
+	start_time = datetime.datetime.fromtimestamp(match['start_time'], tz=pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S")
 	duration = match['duration']
 	print_str += "开始时间: {}\n".format(start_time)
-	print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(
+	print_str += "持续时间: {:.0f}:{:.0f}\n".format(
 		duration / 60, duration % 60)
 	print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
 	print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
@@ -201,7 +198,7 @@ def generate_party_message(match_id: int, player_list: List[Player]) -> list:
 
 # 接收某局比赛的玩家信息, 生成单排战报
 # 参数为玩家对象
-def generate_solo_message(match_id: int, player_obj: Player) -> list:
+def generate_solo_message(match_id: int, player_obj: Player) -> list[str]:
 	try:
 		match = get_match_detail_info(match_id=match_id)
 	except DOTA2HTTPError:
@@ -272,8 +269,7 @@ def generate_solo_message(match_id: int, player_obj: Player) -> list:
 	else:
 		print_str += random.choice(LOSE_NEGATIVE_SOLO).format(player_obj.nickname) + '\n'
 
-	start_time = time.strftime(
-		"%Y-%m-%d %H:%M:%S", time.localtime(match['start_time']+8*60*60))
+	start_time = datetime.datetime.fromtimestamp(match['start_time'], tz=pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S")
 	duration = match['duration']
 	print_str += "开始时间: {}\n".format(start_time)
 	print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(duration // 60, duration % 60)

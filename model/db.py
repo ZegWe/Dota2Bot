@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from os import error
 import sqlite3
-from .player import Player
-import threading
 
 class BaseDB:
 	"""

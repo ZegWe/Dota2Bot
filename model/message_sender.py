@@ -2,10 +2,17 @@
 # -*- coding: UTF-8 -*-
 import json
 import requests
+import datetime
 import time
+import pytz
+
+def get_time():
+	tz = pytz.timezone('Asia/Shanghai')
+	return datetime.datetime.now(tz)
+
 
 class MsgSender:
-	__last_time : float = 0
+	__last_time : datetime.datetime = get_time()
 	def __init__(self, url: str, qid: int, to: int):
 		self.url: str = url
 		self.qid: int = qid
@@ -18,15 +25,36 @@ class MsgSender:
 		return tmp
 
 	@classmethod
-	def get_last_time(cls):
+	def get_last_time(cls) -> datetime.datetime:
 		return cls.__last_time
 
 	@classmethod
-	def set_last_time(cls, time: float):
+	def set_last_time(cls, time: datetime.datetime):
 		cls.__last_time = time
 
-	def send(self):
-		print("Could not send message, You should implement this method yourself")
+	def send(self, message: str):
+		delta = datetime.timedelta(seconds=1.1)
+		send_time = get_time()
+		if get_time() - self.get_last_time() < delta:
+			time.sleep((self.get_last_time() + delta - get_time()).total_seconds())
+		try:
+			data = self._get_data(message)
+			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
+			if json.loads(r.text).get('Ret') == 241:
+				print("\033[1;37;43m{}: message sending failed, resending now...\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
+				print('\n',r.text,'\n')
+				time.sleep(0.5)
+				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
+			self.set_last_time(get_time())
+			if json.loads(r.text).get('Ret') != 0:
+				print("\033[1;37;41m{}: message sending failed.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
+				print('\n',r.text,'\n')
+				return
+			print("\033[1;37;42m{}: message sending succeeded.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
+			print('\n',data,'\n')
+		except Exception as e:
+			print("\033[1;37;41m{}: post request error.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
+			print('\n',repr(e),'\n')
 
 class GroupSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
@@ -38,29 +66,6 @@ class GroupSender(MsgSender):
 				"Content": ""
 			}
 
-	def send(self, message: str):
-		send_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + 8*60*60))
-		if time.time() - self.get_last_time() < 1.1:
-			time.sleep(1.1 - time.time() + self.get_last_time())
-		try:
-			data = self._get_data(message)
-			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
-			if json.loads(r.text).get('Ret') == 241:
-				print("{}: message sending failed, resending now...".format(send_time))
-				print(r.text)
-				time.sleep(0.5)
-				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
-			self.set_last_time(time.time())
-			print(data)
-			if json.loads(r.text).get('Ret') != 0:
-				print("message sending failed.")
-				print(r.text)
-				return
-			print("{}: message sending succeeded".format(send_time))
-		except Exception as e:
-			print(repr(e))
-			print("{}: post request error".format(send_time))
-
 class FriendSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
 		super().__init__(url, qid, to)
@@ -70,20 +75,3 @@ class FriendSender(MsgSender):
 				"SendMsgType": "TextMsg",
 				"Content": ""
 			}
-
-	def sendGroup(self, message: str):
-		data = self._get_data(message)
-		if time.time() - self.get_last_time() < 1.1:
-			time.sleep(1.1 - time.time() + self.get_last_time())
-		try:
-			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
-			self.set_last_time(time.time())
-			print(data)
-			if json.loads(r.text).get('Ret') != 0:
-				print("message sending failed.")
-				print(r.text)
-				return
-			print("message sending succeeded")
-		except Exception as e:
-			print(repr(e))
-			print("post request error")

@@ -1,11 +1,12 @@
 import json
 import os
 
-api_key = ""
-sio_url = ""
-post_url = ""
-bot_id = 1234567890
-groups = []
+api_key : str = ""
+sio_url : str = ""
+post_url : str = ""
+bot_id : int = 1234567890
+groups : list[int]= []
+
 
 def Load(config_dir: str):
 	try:
@@ -18,4 +19,4 @@ def Load(config_dir: str):
 		groups = config['groups']
 	except Exception:
 		print('Read configuration file failed')
-		raise (Exception)
+		raise Exception

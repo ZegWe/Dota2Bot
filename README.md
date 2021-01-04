@@ -18,12 +18,14 @@
 
 This is [OPQ](https://github.com/OPQBOT/OPQ) based QQbot for watching group member's Dota2 game record.
 
+This project is developed under Python3.9.
+
 This bot also integrates a plugin manage system, you can develop any plugin you want.
 
 ## [Usage](#usage)
 
 > Notice: All the command are insensitive to half-width `!` and full-width `！`.
-> 
+
 |已支持插件|插件说明|
 |-|-|
 |[Dota2Watcher](#dota2watcher)|Dota2战绩监视|
@@ -31,7 +33,7 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 
 ### [Plugin Manage](#plugin-manage)
 
-`!插件列表`: List all the plugins and their status(On or Off). Now it only support one plugin named [`Dota2Watcher`](), which is described below, but you can develop your own one.
+`!插件列表`: List all the plugins and their status(On or Off).
 
 `!启用插件 [index]`: Enable a plugin by its `index` in the list
 
@@ -71,6 +73,7 @@ docker pull zegwe/dota2bot:latest
 ```
 
 Create `pluginInfo.db` and `playerInfo.db` file.
+
 ```bash
 mkdir Dota2Bot
 cd Dota2Bot
@@ -78,12 +81,14 @@ touch playerInfo.db
 touch pluginInfo.db
 ```
 
-
 Create and edit `config.json` file
+
 ```bash
 vim config.json
 ```
+
 Here's an example for `config.json`, you can also see this as [`config.example.json`](./config.example.json) in repo
+
 ```json
 {
 	"api_key": "xxxxx",
@@ -96,6 +101,7 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 ```
 
 Run with `Docker`.
+
 ```bash
 docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/playerInfo.db:/opt/dota2bot/playerInfo.db -v $(pwd)/pluginInfo.db:/opt/dota2bot/pluginInfo.db --name dota2bot zegwe/dota2bot:latest
 ```
@@ -103,11 +109,13 @@ docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/player
 #### [Use git](#use-git)
 
 Clone this repo
+
 ```bash
 git clone https://github.com/ZegWe/Dota2Bot.git
 ```
 
 Edit `config.json`
+
 ```bash
 cd Dota2Bot
 cp config.example.json config.json
@@ -115,24 +123,30 @@ vim config.json
 ```
 
 Create `pluginInfo.db` and `playerInfo.db` file.
+
 ```bash
 touch playerInfo.db
 touch pluginInfo.db
 ```
 
 Run with `docker-compose`
+
 ```bash
 docker-compose up -d
 ```
 
 #### [Run python directly](#run-python-directly)
 
+Install [`Python3.9`](https://www.python.org/downloads/)
+
 Clone this repo
+
 ```bash
 git clone https://github.com/ZegWe/Dota2Bot.git
 ```
 
 Edit `config.json`
+
 ```bash
 cd Dota2Bot
 cp config.example.json config.json
@@ -140,6 +154,7 @@ vim config.json
 ```
 
 Run with Python directly
+
 ```bash
 pip install -r requirements.txt
 python app.py

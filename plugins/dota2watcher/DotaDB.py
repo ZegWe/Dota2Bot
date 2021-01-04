@@ -1,7 +1,6 @@
 from model.db import BaseDB
 from model.player import Player
 import sqlite3
-from typing import List
 import threading
 
 class DotaDB(BaseDB):
@@ -47,7 +46,7 @@ class DotaDB(BaseDB):
 		print('{} Closed.'.format(name))
 
 	@classmethod
-	def get_name(cls):
+	def get_name(cls) -> str:
 		return cls.__name
 
 	def get_list(self) -> list:
@@ -56,7 +55,7 @@ class DotaDB(BaseDB):
 
 		$return: 数据库中的player列表
 		"""
-		playerList : List[Player]= []
+		playerList : list[Player]= []
 		self.lock.acquire()
 		cursor = self.c.execute("SELECT * from `playerInfo-{}`".format(self.group_id))
 		for row in cursor:

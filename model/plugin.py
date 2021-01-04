@@ -8,12 +8,12 @@ class Plugin(object):
 	__name = "PluginBaseClass"
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__()
-		self.group_id = group_id
-		self._on = False
-		self.sender = sender
+		self.group_id : int = group_id
+		self._on : bool = False
+		self.sender : GroupSender = sender
 
 	@classmethod
-	def get_name(cls):
+	def get_name(cls) -> str:
 		return cls.__name
 
 	def Set(self, on: bool):

@@ -3,10 +3,9 @@ import argparse
 import Config
 from model.plugmanager import PluginManager, PluginDB
 from plugins.dota2watcher.DotaDB import DotaDB
-from typing import Dict
 
 sio = socketio.Client()
-managers : Dict[int, PluginManager] = {}
+managers : dict[int, PluginManager] = {}
 
 @sio.event
 def connect():
