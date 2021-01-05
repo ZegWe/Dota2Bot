@@ -32,30 +32,38 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 	try:
 		response = requests.get(url)
 	except requests.RequestException:
-		raise DOTA2HTTPError("Requests Error")
+		print(DOTA2HTTPError("Requests Error", url))
+		return -1
 	if response.status_code == 429:
 		try:
 			response = requests.get(url)
 		except requests.RequestException:
-			raise DOTA2HTTPError("Requests Error")
+			print(DOTA2HTTPError("Requests Error", url))
+			return -1
 	if response.status_code >= 400:
 		if response.status_code == 401:
-			raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
+			print(DOTA2HTTPError("Unauthorized request 401. Verify API key.", url))
+			return -1
 		if response.status_code == 429:
-			raise DOTA2HTTPError('429 Too Many Requests!')
+			print(DOTA2HTTPError('429 Too Many Requests!', url))
+			return -1
 		if response.status_code == 503:
-			raise DOTA2HTTPError(
-				"The server is busy or you exceeded limits. Please wait 30s and try again.")
-		raise DOTA2HTTPError(
-			"Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
+			print(DOTA2HTTPError(
+				"The server is busy or you exceeded limits. Please wait 30s and try again.", url))
+			return -1
+		print(DOTA2HTTPError(
+			"Failed to retrieve data: %s. URL: %s" % (response.status_code, url)))
+		return -1
 
 	match = response.json()
 	try:
 		match_id = match["result"]["matches"][0]["match_id"]
 	except KeyError:
-		raise DOTA2HTTPError("Response Error: Key Error")
+		print(DOTA2HTTPError("Response Error: Key Error", url))
+		return -1
 	except IndexError:
-		raise DOTA2HTTPError("Response Error: Index Error")
+		print(DOTA2HTTPError("Response Error: Index Error", url))
+		return -1
 	return match_id
 
 

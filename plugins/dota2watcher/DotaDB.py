@@ -49,7 +49,7 @@ class DotaDB(BaseDB):
 	def get_name(cls) -> str:
 		return cls.__name
 
-	def get_list(self) -> list:
+	def get_list(self) -> list[Player]:
 		"""
 		查询数据库中储存的所有玩家信息，返回一个player列表
 

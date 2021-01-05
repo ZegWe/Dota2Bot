@@ -1,4 +1,5 @@
 from concurrent import futures
+from os import wait
 import time
 from model.player import Player
 from .DotaDB import DotaDB as DB
@@ -7,7 +8,7 @@ from model.plugin import Plugin
 from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, generate_solo_message, steam_id_convert_32_to_64
 import Config
 import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 class Watcher(Plugin):
 	"""
@@ -20,13 +21,9 @@ class Watcher(Plugin):
 		self.db = DB(group_id)
 		self.result = {}
 		self.pool = ThreadPoolExecutor(20)
-		self.playerList : list[Player] = []
-		tmpList = self.db.get_list()
-		taskList = []
-		for player in tmpList:
-			taskList.append(self.pool.submit(self.update_player, player))
-		for task in as_completed(taskList):
-			self.playerList.append(task.result())
+		self.playerList : list[Player] = self.db.get_list()
+		for player in self.playerList:
+			player = self.update_player(player)
 		self.running = True
 		t = self.pool.submit(self.update)
 		print('Dota2 Watcher({}) initialized.'.format(group_id))
@@ -42,12 +39,13 @@ class Watcher(Plugin):
 		except Exception as e:
 			print(repr(e))
 			return player
+		if match_id == -1:
+			return player
 		if match_id != player.last_DOTA2_match_ID:
 			if self.result.get(match_id, 0) != 0:
 				self.result[match_id].append(player)
 			else:
 				self.result.update({match_id: [player]})
-			
 			self.db.update_DOTA2_match_ID(player.short_steamID, match_id)
 			player.last_DOTA2_match_ID = match_id
 		return player
@@ -60,13 +58,12 @@ class Watcher(Plugin):
 				time.sleep(5)
 				continue
 			if self.On():
-				taskList : list = []
-				for player in self.playerList:
-					taskList.append(self.pool.submit(self.update_player, player))
-				self.playerList.clear()
-				for task in as_completed(taskList):
-					self.playerList.append(task.result())
-				# print('---------')
+				# taskList : list[futures.Future] = []
+				# for player in self.playerList:
+					# taskList.append(self.pool.submit(self.update_player, player))
+				tmpList = self.pool.map(self.update_player, self.playerList)
+					
+				self.playerList = list(tmpList)
 				for match_id in self.result:
 					if len(self.result[match_id]) > 1:
 						for message in generate_party_message(match_id, self.result[match_id]):
@@ -113,16 +110,17 @@ class Watcher(Plugin):
 			self.sender.send('移除监视成功！')
 
 	def show_watch(self):
+		# print(self.playerList)
+		if len(self.playerList) == 0:
+			m = '没有正在监视的账号！'
+			self.sender.send(m)
+			return
 		m = '以下账号被监视中：'
 		for index, player in enumerate(self.playerList):
 			m += '\n{}. {}({})'.format(index + 1, player.nickname, player.short_steamID)
 			if index % 8 == 6:
 				self.sender.send(m)
 				m = ''
-		if len(self.playerList) == 0:
-			m = '没有正在监视的账号！'
-			self.sender.send(m)
-			return
 		if len(m):
 			self.sender.send(m)
 

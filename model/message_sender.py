@@ -41,7 +41,7 @@ class MsgSender:
 			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			if json.loads(r.text).get('Ret') == 241:
-				print("\033[1;37;43m{}: message sending failed, resending now...\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
+				print("\033[1;32;43m{}: message sending failed, resending now...\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
 				print('\n',r.text,'\n')
 				time.sleep(0.5)
 				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
