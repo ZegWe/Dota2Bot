@@ -44,10 +44,6 @@ def init():
 		managers[group].add_plugin('DOTA2战绩播报', True)
 		managers[group].add_plugin('DOTA2每日运势', True)
 
-@sio.event
-def GetWebConn(data):
-	sio.emit('GetWebConn', data)
-
 def heartbeat():
 	while sio_connected:
 		for i in range(50):
@@ -66,7 +62,7 @@ if __name__ == "__main__":
 	sio.connect(Config.sio_url, transports=['websocket'])
 	sio_connected = True
 	t = threading.Thread(target=heartbeat)
-	t.start()
+	# t.start()
 	try:
 		sio.wait()
 	except KeyboardInterrupt:
@@ -75,6 +71,6 @@ if __name__ == "__main__":
 			managers[group].shutdown()
 		PluginDB.disconnect(PluginDB.get_name())
 		DotaDB.disconnect(DotaDB.get_name())
-		t.join()
+		# t.join()
 		print('Say you next time~')
 		exit(0)

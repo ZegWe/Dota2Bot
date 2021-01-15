@@ -141,3 +141,6 @@ watcher_config.json
 # db
 playerInfo.db
 pluginInfo.db
+
+# test files
+test.py

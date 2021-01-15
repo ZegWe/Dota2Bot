@@ -6,10 +6,9 @@ import datetime
 import time
 import pytz
 
-def get_time():
+def get_time() -> datetime.datetime:
 	tz = pytz.timezone('Asia/Shanghai')
 	return datetime.datetime.now(tz)
-
 
 class MsgSender:
 	__last_time : datetime.datetime = get_time()

@@ -6,6 +6,14 @@ import Config
 from plugins import PLUGIN_DICT
 from .message_sender import GroupSender
 import sqlite3
+import random
+
+NoCommandmessages : list[str] = [
+	'你说啥玩意儿？',
+	'你在说你🐎呢？',
+	'那是只松鼠吗？',
+	'Blee~ Bloo~ 我是个机器人',
+]
 
 class PluginManager(object):
 	"""
@@ -52,7 +60,7 @@ class PluginManager(object):
 					if plugin.handle(data):
 						return
 		if re.match(r'^[!！]', m):
-			self.sender.send('未找到此命令！')
+			self.sender.send(random.choice(NoCommandmessages))
 
 
 	def add_plugin(self, plugin_name: str, status: bool):

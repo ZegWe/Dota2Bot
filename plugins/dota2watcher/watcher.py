@@ -1,4 +1,3 @@
-from concurrent import futures
 from os import wait
 import time
 from model.player import Player
@@ -9,6 +8,7 @@ from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, g
 import Config
 import re
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 class Watcher(Plugin):
 	"""
@@ -19,8 +19,9 @@ class Watcher(Plugin):
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__(group_id, sender)
 		self.db = DB(group_id)
-		self.result = {}
+		self.result : dict[int, list[Player]] = {}
 		self.pool = ThreadPoolExecutor(20)
+		self.lock = Lock()
 		self.playerList : list[Player] = self.db.get_list()
 		for player in self.playerList:
 			player = self.update_player(player)
@@ -42,10 +43,12 @@ class Watcher(Plugin):
 		if match_id == -1:
 			return player
 		if match_id != player.last_DOTA2_match_ID:
+			self.lock.acquire()
 			if self.result.get(match_id, 0) != 0:
 				self.result[match_id].append(player)
 			else:
 				self.result.update({match_id: [player]})
+			self.lock.release()
 			self.db.update_DOTA2_match_ID(player.short_steamID, match_id)
 			player.last_DOTA2_match_ID = match_id
 		return player
@@ -58,11 +61,8 @@ class Watcher(Plugin):
 				time.sleep(5)
 				continue
 			if self.On():
-				# taskList : list[futures.Future] = []
-				# for player in self.playerList:
-					# taskList.append(self.pool.submit(self.update_player, player))
 				tmpList = self.pool.map(self.update_player, self.playerList)
-					
+				
 				self.playerList = list(tmpList)
 				for match_id in self.result:
 					if len(self.result[match_id]) > 1:
