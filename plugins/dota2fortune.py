@@ -68,6 +68,7 @@ class Fortune(Plugin):
 		else:
 			tmp = random.sample(fortuneDict.keys(), 1)[0]
 			tmp_user = User(tmp, random.choice(fortuneDict[tmp]))
+			self.users[FromUserId] = tmp_user
 
 		m = '[ATUSER({})] 的今日运势：\n\n'.format(str(FromUserId))
 		m += '{}\n\n'.format(tmp_user.fort)
