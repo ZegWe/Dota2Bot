@@ -71,7 +71,7 @@ class Watcher(Plugin):
 					elif len(self.result[match_id]) == 1:
 						for message in generate_solo_message(match_id, self.result[match_id][0]):
 							self.sender.send(message)
-			time.sleep((24 * 60 * 60) / (100000 / (2 * len(self.playerList))))
+			time.sleep(60)
 		print('Watching Loop exited: {}'.format(self.group_id))
 
 	def shutdown(self):
