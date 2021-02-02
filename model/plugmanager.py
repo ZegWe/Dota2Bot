@@ -38,7 +38,7 @@ class PluginManager(object):
 			return
 		elif re.match(r'^[！!]启用插件\s+\S+', m):
 			try:
-				s = re.match(r'^[！!]启用插件\s+\S+', m)[0]
+				s = str(re.match(r'^[！!]启用插件\s+\S+', m)[0])
 				index = int(re.split(r'\s+', s)[1])
 				self.enable_plugin(index)
 			except TypeError as e:
@@ -47,7 +47,7 @@ class PluginManager(object):
 			return
 		elif re.match(r'^[！!]禁用插件\s+\S+', m):
 			try:
-				s = re.match(r'^[！!]禁用插件\s+\S+', m)[0]
+				s = str(re.match(r'^[！!]禁用插件\s+\S+', m)[0])
 				index = int(re.split(r'\s+', s)[1])
 				self.disable_plugin(index)
 			except TypeError as e:

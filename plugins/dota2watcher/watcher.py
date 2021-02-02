@@ -71,7 +71,7 @@ class Watcher(Plugin):
 					elif len(self.result[match_id]) == 1:
 						for message in generate_solo_message(match_id, self.result[match_id][0]):
 							self.sender.send(message)
-			time.sleep(60)
+			time.sleep(300)
 		print('Watching Loop exited: {}'.format(self.group_id))
 
 	def shutdown(self):
@@ -131,7 +131,7 @@ class Watcher(Plugin):
 			return True
 		elif re.match(r'^[!！]移除监视\s+\S+', m):
 			try:
-				s = re.match(r'^[!！]移除监视\s+\S+', m)[0]
+				s = str(re.match(r'^[!！]移除监视\s+\S+', m)[0])
 				index = int(re.split(r'\s+', s)[1])
 				self.remove_watch(index)
 			except Exception as e:
@@ -140,7 +140,7 @@ class Watcher(Plugin):
 			finally: return True
 		elif re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m):
 			try:
-				s = re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m)[0]
+				s = str(re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m)[0])
 				# print(s)
 				_, nickname, steamID, qqid = re.split(r'\s+', s)
 				# print(nickname, steamID, qqid)
