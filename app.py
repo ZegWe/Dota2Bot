@@ -1,10 +1,8 @@
-import time
 import socketio
 import argparse
 import Config
-from model.plugmanager import PluginManager, PluginDB
-from plugins.dota2watcher.DotaDB import DotaDB
-import threading
+from model.plugmanager import PluginManager
+from model.db import BaseDB
 
 sio = socketio.Client()
 managers : dict[int, PluginManager] = {}
@@ -39,6 +37,7 @@ def init():
 	parser.add_argument('-c', '--config', default='./config.json')
 	args = parser.parse_args()
 	Config.Load(args.config)
+	BaseDB.connect()
 	for group in Config.groups:
 		managers[group] = PluginManager(group)
 		managers[group].add_plugin('DOTA2战绩播报', True)
@@ -53,7 +52,6 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		for group in managers:
 			managers[group].shutdown()
-		PluginDB.disconnect(PluginDB.get_name())
-		DotaDB.disconnect(DotaDB.get_name())
+		BaseDB.disconnect()
 		print('Say you next time~')
 		exit(0)

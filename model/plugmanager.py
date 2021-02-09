@@ -1,11 +1,9 @@
-import threading
 from model.db import BaseDB
 from model.plugin import Plugin
 import re
 import Config
 from plugins import PLUGIN_DICT
 from .message_sender import GroupSender
-import sqlite3
 import random
 
 NoCommandmessages : list[str] = [
@@ -118,34 +116,12 @@ class PluginDB(BaseDB):
 	__name = "PluginDB"
 	def __init__(self, group_id: int):
 		self.group_id = group_id
-		if not hasattr(self, 'c'):
-			self.connect('pluginInfo.db')
 		self.c.execute("""
 		CREATE TABLE IF NOT EXISTS `pluginInfo-{}` 
 		(plugin_name CHAR(50) PRIMARY KEY NOT NULL,
 		status BOOLEAN NOT NULL);
 		""" .format(self.group_id))
 		self.conn.commit()
-		
-	@classmethod
-	def connect(cls, db_file: str):
-		"""
-		创建数据库文件连接，注意：这是一个类方法！
-		"""
-		print('Initializing {}...'.format(cls.__name), end='', flush=True)
-		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
-		cls.c = cls.conn.cursor()
-		cls.lock = threading.Lock()
-		print('\r', end='', flush=True)
-		print('\033[0;32mDatabase {} initialized.\033[0m'.format(cls.__name), flush=True)
-
-	@classmethod
-	def disconnect(cls, name: str):
-		"""
-		断开数据库文件连接，注意：这是一个类方法！
-		"""
-		cls.conn.close()
-		print('{} Closed.'.format(name))
 
 	@classmethod
 	def get_name(cls) -> str:

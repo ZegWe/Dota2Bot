@@ -1,7 +1,5 @@
 from model.db import BaseDB
 from model.player import Player
-import sqlite3
-import threading
 
 class DotaDB(BaseDB):
 	"""
@@ -13,8 +11,6 @@ class DotaDB(BaseDB):
 		:param group_id: Watcher提供的群号
 		"""
 		self.group_id = group_id
-		if not hasattr(self, 'c'):
-			self.connect('playerInfo.db')
 		self.c.execute('''
 		CREATE TABLE IF NOT EXISTS `playerInfo-{}`
 		(short_steamID INT PRIMARYKEY NOT NULL,
@@ -24,26 +20,6 @@ class DotaDB(BaseDB):
 		last_DOTA2_match_ID INT);
 		''' .format(group_id))
 		self.conn.commit()
-
-	@classmethod
-	def connect(cls, db_file: str):
-		"""
-		创建数据库文件连接，注意：这是一个类方法！
-		"""
-		print('Initializing {}...'.format(cls.__name), end='', flush=True)
-		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
-		cls.c = cls.conn.cursor()
-		cls.lock = threading.Lock()
-		print('\r', end='', flush=True)
-		print('\033[0;32mDatabase {} initialized.\033[0m'.format(cls.__name), flush=True)
-
-	@classmethod
-	def disconnect(cls, name: str):
-		"""
-		断开数据库文件连接，注意：这是一个类方法！
-		"""
-		cls.conn.close()
-		print('{} Closed.'.format(name))
 
 	@classmethod
 	def get_name(cls) -> str:

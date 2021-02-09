@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import sqlite3
+from threading import Lock
 
 class BaseDB:
 	"""
@@ -9,26 +10,24 @@ class BaseDB:
 	已封装connect和disconnect函数
 	使用数据库时请务必加上线程锁
 	"""
+	__filename : str = "botInfo.db"
 	def __init__(self, group_id: int):
-		raise SyntaxError
 		self.group_id = group_id
 
 	@classmethod
-	def connect(cls, db_file: str, name: str):
+	def connect(cls):
 		"""
 		创建数据库文件连接，注意：这是一个类方法！
 		"""
-		raise SyntaxError
-		print('Initializing {}...'.format(name), end='', flush=True)
-		cls.conn = sqlite3.connect(db_file, check_same_thread=False)
+		cls.conn = sqlite3.connect(cls.__filename, check_same_thread=False)
 		cls.c = cls.conn.cursor()
-		print('\r', end='', flush=True)
-		print('\033[0;32mDatabase {} initialized.\033[0m'.format(name), flush=True)
+		cls.lock = Lock()
+		print('\033[0;32mDatabase initialized.\033[0m')
+
 	@classmethod
-	def disconnect(cls, name: str):
+	def disconnect(cls):
 		"""
 		断开数据库文件连接，注意：这是一个类方法！
 		"""
-		raise SyntaxError
 		cls.conn.close()
-		print('{} Closed.'.format(name))
+		print('Database Closed.')

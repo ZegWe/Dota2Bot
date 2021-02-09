@@ -154,4 +154,4 @@ class Watcher(Plugin):
 
 def test():
 	Config.Load('./config.json')
-	DB.connect('playerInfo.db')
+	DB.connect()
