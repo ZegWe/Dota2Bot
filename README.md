@@ -72,13 +72,12 @@ Pull docker image from [DockerHub](https://hub.docker.com/r/zegwe/dota2bot)
 docker pull zegwe/dota2bot:latest
 ```
 
-Create `pluginInfo.db` and `playerInfo.db` file.
+Create `botInfo.db` file.
 
 ```bash
 mkdir Dota2Bot
 cd Dota2Bot
-touch playerInfo.db
-touch pluginInfo.db
+touch botInfo.db
 ```
 
 Create and edit `config.json` file
@@ -103,7 +102,7 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 Run with `Docker`.
 
 ```bash
-docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/playerInfo.db:/opt/dota2bot/playerInfo.db -v $(pwd)/pluginInfo.db:/opt/dota2bot/pluginInfo.db --name dota2bot zegwe/dota2bot:latest
+docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/botInfo.db:/opt/dota2bot/botInfo.db --name dota2bot zegwe/dota2bot:latest
 ```
 
 #### [Use git](#use-git)
@@ -122,11 +121,10 @@ cp config.example.json config.json
 vim config.json
 ```
 
-Create `pluginInfo.db` and `playerInfo.db` file.
+Create `botInfo.db.db` file.
 
 ```bash
-touch playerInfo.db
-touch pluginInfo.db
+touch botInfo.db
 ```
 
 Run with `docker-compose`

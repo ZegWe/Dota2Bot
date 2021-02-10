@@ -4,5 +4,4 @@ services:
     build: .
     volumes:
       - ${PWD}/config.json:/opt/bot/config.json
-      - ${PWD}/pluginInfo.db:/opt/bot/pluginInfo.db
-      - ${PWD}/playerInfo.db:/opt/bot/playerInfo.db
+      - ${PWD}/botInfo.db:/opt/bot/botInfo.db
