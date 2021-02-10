@@ -141,7 +141,7 @@ class PluginDB(BaseDB):
 		self.c.execute("INSERT INTO `pluginInfo-{}` (plugin_name, status) VALUES ('{}', {})"
 			.format(self.group_id, plugin_name, status))
 		self.conn.commit()
-		self.lock.acquire()
+		self.lock.release()
 
 	def update_info(self, plugin_name: str, status: bool):
 		self.lock.acquire()
