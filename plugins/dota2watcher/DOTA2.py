@@ -184,8 +184,8 @@ def generate_party_message(match_id: int, player_list: list[Player]) -> list[str
 	print_str += "开始时间: {}\n".format(start_time)
 	print_str += "持续时间: {:.0f}:{:.0f}\n".format(
 		duration / 60, duration % 60)
-	print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
-	# print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
+	print_str += '游戏模式: [{}/{}]'.format(mode, lobby)
+	# print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
 	m = [print_str]
 	for i in player_list:
 		hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
@@ -282,8 +282,8 @@ def generate_solo_message(match_id: int, player_obj: Player) -> list[str]:
 	print_str += "开始时间: {}\n".format(start_time)
 	print_str += "持续时间: {:.0f}分{:.0f}秒\n".format(duration // 60, duration % 60)
 
-	print_str += '游戏模式: [{}/{}]\n'.format(mode, lobby)
-	# print_str += "战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
+	print_str += '游戏模式: [{}/{}]'.format(mode, lobby)
+	# print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
 	m = [print_str]
 	hero = HEROES_LIST_CHINESE[player_obj.hero] if player_obj.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
 	kda = player_obj.kda
