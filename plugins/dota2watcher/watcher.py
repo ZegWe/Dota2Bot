@@ -4,7 +4,7 @@ from model.player import Player
 from .DotaDB import DotaDB as DB
 from model.message_sender import GroupSender
 from model.plugin import Plugin
-from .DOTA2 import get_last_match_id_by_short_steamID, generate_party_message, generate_solo_message, steam_id_convert_32_to_64
+from .DOTA2 import get_last_match_id_by_short_steamID, generate_message, steam_id_convert_32_to_64
 import Config
 import re
 from concurrent.futures import ThreadPoolExecutor
@@ -65,12 +65,8 @@ class Watcher(Plugin):
 				
 				self.playerList = list(tmpList)
 				for match_id in self.result:
-					if len(self.result[match_id]) > 1:
-						for message in generate_party_message(match_id, self.result[match_id]):
-							self.sender.send(message)
-					elif len(self.result[match_id]) == 1:
-						for message in generate_solo_message(match_id, self.result[match_id][0]):
-							self.sender.send(message)
+					for message in generate_message(match_id, self.result[match_id]):
+						self.sender.send(message)
 			time.sleep(300)
 		print('Watching Loop exited: {}'.format(self.group_id))
 
