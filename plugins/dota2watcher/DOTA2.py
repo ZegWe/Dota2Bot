@@ -95,7 +95,7 @@ def get_match_detail_info(match_id: int) -> dict:
     return match_info
 
 
-# 接收某局比赛的玩家列表, 生成开黑战报
+# 接收某局比赛的玩家列表, 生成战报
 # 参数为玩家对象列表和比赛ID
 def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	try:
