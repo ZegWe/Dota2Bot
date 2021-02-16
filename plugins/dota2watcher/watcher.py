@@ -1,14 +1,18 @@
-from os import wait
-import time
-from model.player import Player
-from .DotaDB import DotaDB as DB
-from model.message_sender import GroupSender
-from model.plugin import Plugin
-from .DOTA2 import get_last_match_id_by_short_steamID, generate_message, steam_id_convert_32_to_64
-import Config
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
+
+import Config
+from model.logger import logger
+from model.message_sender import GroupSender
+from model.player import Player
+from model.plugin import Plugin
+
+from .DOTA2 import (generate_message, get_last_match_id_by_short_steamID,
+                    steam_id_convert_32_to_64)
+from .DotaDB import DotaDB as DB
+
 
 class Watcher(Plugin):
 	"""
@@ -27,7 +31,7 @@ class Watcher(Plugin):
 			player = self.update_player(player)
 		self.running = True
 		t = self.pool.submit(self.update)
-		print('Dota2 Watcher({}) initialized.'.format(group_id))
+		logger.debug('Dota2 Watcher({}) initialized.'.format(group_id))
 
 	@classmethod
 	def get_name(cls):
@@ -38,7 +42,7 @@ class Watcher(Plugin):
 		try:
 			match_id = get_last_match_id_by_short_steamID(player.short_steamID)
 		except Exception as e:
-			print(repr(e))
+			logger.error(repr(e))
 			return player
 		if match_id == -1:
 			return player
@@ -54,7 +58,7 @@ class Watcher(Plugin):
 		return player
 
 	def update(self):
-		print('Watch Loop started: {}'.format(self.group_id))
+		logger.debug('Watch Loop started: {}'.format(self.group_id))
 		while self.running:
 			self.result.clear()
 			if len(self.playerList) == 0:
@@ -68,7 +72,7 @@ class Watcher(Plugin):
 					for message in generate_message(match_id, self.result[match_id]):
 						self.sender.send(message)
 			time.sleep(300)
-		print('Watching Loop exited: {}'.format(self.group_id))
+		logger.debug('Watching Loop exited: {}'.format(self.group_id))
 
 	def shutdown(self):
 		self.running = False
@@ -77,21 +81,21 @@ class Watcher(Plugin):
 
 	def add_watch(self, nickname, shortID, qqid):
 		if self.db.is_player_stored(shortID):
-			print('Already added')
+			logger.warning('Player already watched.')
 			self.sender.send('该账号已经存在，请勿重复添加！')
 			return
 		longID = steam_id_convert_32_to_64(shortID)
 		last_match = get_last_match_id_by_short_steamID(shortID)
 		self.db.insert_info(shortID, longID, qqid, nickname, last_match)
 		self.playerList.append(Player(nickname, qqid, shortID, longID, last_match))
-		print('Player information added successfully')
+		logger.success('Player information added successfully.')
 		self.sender.send('添加监视成功！')
 
 	def remove_watch(self, index: int):
 		try:
 			shortID = self.playerList[index - 1].short_steamID
 		except Exception as e:
-			print('Remove Watch Error Index: {}'.format(repr(e)))
+			logger.error('Remove Watch Error Index: {}'.format(repr(e)))
 			self.sender.send('请输入正确的序号！')
 			return
 		try:
@@ -99,10 +103,10 @@ class Watcher(Plugin):
 				self.db.delete_info(shortID)
 			del self.playerList[index - 1]
 		except Exception as e:
-			print('Remove Watch Error: {}'.format(repr(e)))
+			logger.error('Remove Watch Error: {}'.format(repr(e)))
 			self.sender.send('移除监视失败！')
 		else:
-			print('Remove Watch Successfully!')
+			logger.success('Remove Watch Successfully!')
 			self.sender.send('移除监视成功！')
 
 	def show_watch(self):
@@ -131,7 +135,7 @@ class Watcher(Plugin):
 				index = int(re.split(r'\s+', s)[1])
 				self.remove_watch(index)
 			except Exception as e:
-				print('Remove Watch Error Argument: {}'.format(repr(e)))
+				logger.error('Remove Watch Error Argument: {}'.format(repr(e)))
 				self.sender.send('请输入正确的参数！')
 			finally: return True
 		elif re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m):
@@ -142,7 +146,7 @@ class Watcher(Plugin):
 				# print(nickname, steamID, qqid)
 				self.add_watch(nickname, int(steamID), int(qqid))
 			except Exception as e:
-				print('Add Watch Error Argument: {}'.format(repr(e)))
+				logger.error('Add Watch Error Argument: {}'.format(repr(e)))
 				self.sender.send('请输入正确的参数！')
 			finally: return True
 

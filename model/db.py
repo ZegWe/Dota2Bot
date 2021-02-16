@@ -1,7 +1,8 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
 import sqlite3
 from threading import Lock
+
+from .logger import logger
+
 
 class BaseDB:
 	"""
@@ -22,7 +23,7 @@ class BaseDB:
 		cls.conn = sqlite3.connect(cls.__filename, check_same_thread=False)
 		cls.c = cls.conn.cursor()
 		cls.lock = Lock()
-		print('\033[0;32mDatabase initialized.\033[0m')
+		logger.debug('Database initialized.')
 
 	@classmethod
 	def disconnect(cls):
@@ -30,4 +31,4 @@ class BaseDB:
 		断开数据库文件连接，注意：这是一个类方法！
 		"""
 		cls.conn.close()
-		print('Database Closed.')
+		logger.debug('Database Closed.')

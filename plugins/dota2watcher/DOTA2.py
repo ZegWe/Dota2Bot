@@ -1,11 +1,14 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import requests
-from .DOTA2_dicts import *
-from model.player import Player
-import pytz, datetime
+import datetime
 import random
+
 import Config
+import pytz
+import requests
+from model.logger import logger
+from model.player import Player
+
+from .DOTA2_dicts import *
+
 
 # 异常处理
 class DOTA2HTTPError(Exception):
@@ -13,7 +16,6 @@ class DOTA2HTTPError(Exception):
 
 def steam_id_convert_32_to_64(short_steamID: int) -> int:
     return short_steamID + 76561197960265728
-
 
 def steam_id_convert_64_to_32(long_steamID: int) -> int:
     return long_steamID - 76561197960265728
@@ -32,26 +34,26 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 	try:
 		response = requests.get(url)
 	except requests.RequestException:
-		print(DOTA2HTTPError("Requests Error", url))
+		logger.error(DOTA2HTTPError("Requests Error", url))
 		return -1
 	if response.status_code == 429:
 		try:
 			response = requests.get(url)
 		except requests.RequestException:
-			print(DOTA2HTTPError("Requests Error", url))
+			logger.error(DOTA2HTTPError("Requests Error", url))
 			return -1
 	if response.status_code >= 400:
 		if response.status_code == 401:
-			print(DOTA2HTTPError("Unauthorized request 401. Verify API key.", url))
+			logger.error(DOTA2HTTPError("Unauthorized request 401. Verify API key.", url))
 			return -1
 		if response.status_code == 429:
-			print(DOTA2HTTPError('429 Too Many Requests!', url))
+			logger.error(DOTA2HTTPError('429 Too Many Requests!', url))
 			return -1
 		if response.status_code == 503:
-			print(DOTA2HTTPError(
+			logger.error(DOTA2HTTPError(
 				"The server is busy or you exceeded limits. Please wait 30s and try again.", url))
 			return -1
-		print(DOTA2HTTPError(
+		logger.error(DOTA2HTTPError(
 			"Failed to retrieve data: %s. URL: %s" % (response.status_code, url)))
 		return -1
 
@@ -59,10 +61,10 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 	try:
 		match_id = match["result"]["matches"][0]["match_id"]
 	except KeyError:
-		print(DOTA2HTTPError("Response Error: Key Error", url))
+		logger.error(DOTA2HTTPError("Response Error: Key Error", url))
 		return -1
 	except IndexError:
-		print(DOTA2HTTPError("Response Error: Index Error", url))
+		logger.error(DOTA2HTTPError("Response Error: Index Error", url))
 		return -1
 	return match_id
 
@@ -74,7 +76,7 @@ def get_match_detail_info(match_id: int) -> dict:
     try:
         response = requests.get(url)
     except requests.RequestException:
-        raise DOTA2HTTPError("Requests Error")
+        raise DOTA2HTTPError("Requests Error.")
     if response.status_code >= 400:
         if response.status_code == 401:
             raise DOTA2HTTPError("Unauthorized request 401. Verify API key.")
@@ -94,13 +96,13 @@ def get_match_detail_info(match_id: int) -> dict:
 
     return match_info
 
-
 # 接收某局比赛的玩家列表, 生成战报
 # 参数为玩家对象列表和比赛ID
 def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	try:
 		match = get_match_detail_info(match_id=match_id)
-	except DOTA2HTTPError:
+	except DOTA2HTTPError as e:
+		logger.error(e)
 		return ["DOTA2战报生成失败"]
 
     # 比赛模式

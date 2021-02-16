@@ -1,6 +1,7 @@
 from model.db import BaseDB
 from model.player import Player
 
+
 class DotaDB(BaseDB):
 	"""
 	基于BaseDB的DOta2战绩数据库，以供Dota2Watcher插件使用

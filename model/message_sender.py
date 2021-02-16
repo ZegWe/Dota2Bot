@@ -1,10 +1,12 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-import json
-import requests
 import datetime
+import json
 import time
+
 import pytz
+import requests
+
+from .logger import logger
+
 
 def get_time() -> datetime.datetime:
 	tz = pytz.timezone('Asia/Shanghai')
@@ -34,26 +36,22 @@ class MsgSender:
 	def send(self, message: str):
 		delta = datetime.timedelta(seconds=1.1)
 		send_time = get_time()
-		if get_time() - self.get_last_time() < delta:
-			time.sleep((self.get_last_time() + delta - get_time()).total_seconds())
+		if send_time - self.get_last_time() < delta:
+			time.sleep((self.get_last_time() + delta - send_time).total_seconds())
 		try:
 			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			if json.loads(r.text).get('Ret') == 241:
-				print("\033[1;32;43m{}: message sending failed, resending now...\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
-				print('\n',r.text,'\n')
+				logger.warning("Message sending failed, resending now...\n{}".format(r.text))
 				time.sleep(0.5)
 				r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			self.set_last_time(get_time())
 			if json.loads(r.text).get('Ret') != 0:
-				print("\033[1;37;41m{}: message sending failed.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
-				print('\n',r.text,'\n')
+				logger.error("Message sending failed.\n{}".format(r.text))
 				return
-			print("\033[1;37;42m{}: message sending succeeded.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
-			print('\n',data,'\n')
+			logger.success("Message sending succeeded.\n{}".format(data))
 		except Exception as e:
-			print("\033[1;37;41m{}: post request error.\033[0m".format(send_time.strftime("%Y-%m-%d %H:%M:%S")))
-			print('\n',repr(e),'\n')
+			logger.error("Post request error.\n{}".format(repr(e)))
 
 class GroupSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):

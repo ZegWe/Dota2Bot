@@ -1,4 +1,6 @@
+from .logger import logger
 from .message_sender import GroupSender
+
 
 class Plugin(object):
 	"""
@@ -7,7 +9,6 @@ class Plugin(object):
 	"""
 	__name = "PluginBaseClass"
 	def __init__(self, group_id: int, sender: GroupSender):
-		super().__init__()
 		self.group_id : int = group_id
 		self._on : bool = False
 		self.sender : GroupSender = sender
@@ -23,7 +24,7 @@ class Plugin(object):
 		return self._on
 
 	def shutdown(self):
-		print('plugin {} shutdown'.format(self.get_name()))
+		logger.debug('Plugin {} shutdown.'.format(self.get_name()))
 
 	def handle(self, data: dict):
 		pass

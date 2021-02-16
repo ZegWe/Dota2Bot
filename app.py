@@ -1,15 +1,18 @@
-import socketio
 import argparse
+
+import socketio
+
 import Config
-from model.plugmanager import PluginManager
 from model.db import BaseDB
+from model.logger import logger
+from model.plugmanager import PluginManager
 
 sio = socketio.Client()
 managers : dict[int, PluginManager] = {}
 
 @sio.event
 def connect():
-	print('\rConnection established.', flush=True)
+	logger.success('Connection established.')
 
 @sio.event
 def OnGroupMsgs(data):
@@ -22,15 +25,15 @@ def OnGroupMsgs(data):
 
 @sio.event
 def OnFriendMsgs(data):
-	print('OnFriendMsgs: ', data)
+	logger.info('OnFriendMsgs: {}'.format(data))
 
 @sio.event
 def OnEvents(data):
-	print('OnEvents: ', data)
+	logger.info('OnEvents: {}'.format(data))
 
 @sio.event
 def disconnect():
-    print('disconnected from server')
+    logger.warning('Disconnected from server')
 
 def init():
 	parser = argparse.ArgumentParser()
@@ -45,7 +48,7 @@ def init():
 
 if __name__ == "__main__":
 	init()
-	print('Connecting to server...', end='', flush=True)
+	logger.debug('Connecting to server...')
 	sio.connect(Config.sio_url, transports=['websocket'])
 	try:
 		sio.wait()
@@ -53,5 +56,5 @@ if __name__ == "__main__":
 		for group in managers:
 			managers[group].shutdown()
 		BaseDB.disconnect()
-		print('Say you next time~')
+		logger.info('Say you next time~')
 		exit(0)

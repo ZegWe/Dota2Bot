@@ -1,8 +1,4 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
 # 可以在这里添加新的阴阳怪气, {}为昵称位置
-
-# 单排的阴阳怪气
 Messages : list[list[str]] = [
 [# lose negative party
     '{}被人按在地上摩擦, 输掉了这场比赛',

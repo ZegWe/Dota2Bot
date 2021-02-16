@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-
-
 class Player:
     # 基本属性
 	short_steamID : int = 0

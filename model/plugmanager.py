@@ -1,10 +1,13 @@
-from model.db import BaseDB
-from model.plugin import Plugin
+import random
 import re
+
 import Config
 from plugins import PLUGIN_DICT
+
+from .db import BaseDB
+from .logger import logger
 from .message_sender import GroupSender
-import random
+from .plugin import Plugin
 
 NoCommandmessages : list[str] = [
 	'你说啥玩意儿？',
@@ -27,7 +30,7 @@ class PluginManager(object):
 			new_plugin : Plugin = PLUGIN_DICT[plugin_name](group_id, self.sender)
 			new_plugin.Set(pluginlist[plugin_name])
 			self.plugins.append(new_plugin)
-		print('Plugin Manager({}) Initialized.'.format(group_id))
+		logger.success('Plugin Manager({}) Initialized.'.format(group_id))
 
 	def handle(self, data: dict):
 		m = data['Content']
@@ -40,7 +43,7 @@ class PluginManager(object):
 				index = int(re.split(r'\s+', s)[1])
 				self.enable_plugin(index)
 			except TypeError as e:
-				print('Argument Error: {}'.format(e))
+				logger.error('Argument Error: {}'.format(e))
 				self.sender.send('请输入正确的参数！')
 			return
 		elif re.match(r'^[！!]禁用插件\s+\S+', m):
@@ -49,7 +52,7 @@ class PluginManager(object):
 				index = int(re.split(r'\s+', s)[1])
 				self.disable_plugin(index)
 			except TypeError as e:
-				print('Argument Error: {}'.format(e))
+				logger.error('Argument Error: {}'.format(e))
 				self.sender.send('请输入正确的参数！')
 			return
 		else:
@@ -86,10 +89,10 @@ class PluginManager(object):
 			self.plugins[index - 1].Set(True)
 			self.db.update_info(self.plugins[index-1].get_name(), True)
 		except Exception as e:
-			print('Enable Plugin Failed: {}'.format(repr(repr(e))))
+			logger.error('Enable Plugin Failed: {}'.format(repr(repr(e))))
 			self.sender.send('启用插件失败！')
 		else:
-			print('Plugin {} Enabled!'.format(self.plugins[index - 1].get_name()))
+			logger.success('Plugin {} Enabled!'.format(self.plugins[index - 1].get_name()))
 			self.sender.send('插件 {} 已启用'.format(self.plugins[index - 1].get_name()))
 
 	def disable_plugin(self, index: int):
@@ -97,16 +100,16 @@ class PluginManager(object):
 			self.plugins[index - 1].Set(False)
 			self.db.update_info(self.plugins[index-1].get_name(), False)
 		except Exception as e:
-			print('Disable Plugin Failed: {}'.format(e))
+			logger.error('Disable Plugin Failed: {}'.format(e))
 			self.sender.send('禁用插件失败！')
 		else:
-			print('Plugin {} Disabled!'.format(self.plugins[index - 1].get_name()))
+			logger.success('Plugin {} Disabled!'.format(self.plugins[index - 1].get_name()))
 			self.sender.send('插件 {} 已禁用'.format(self.plugins[index-1].get_name()))
 
 	def shutdown(self):
 		for plugin in self.plugins:
 			plugin.shutdown()
-		print('manager({}) shutdown'.format(self.group_id))
+		logger.info('manager({}) shutdown'.format(self.group_id))
 
 class PluginDB(BaseDB):
 	"""
