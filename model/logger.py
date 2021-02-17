@@ -9,4 +9,4 @@ def init_logger(debug: bool):
 	else:
 		logger.add(sys.stdout, level='INFO', format='<level>{time:YYYY-MM-DD HH:mm:ss.SSS} {level} {message}</level>')
 
-# init_logger(False)
+init_logger(False)
