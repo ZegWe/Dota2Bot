@@ -1,9 +1,10 @@
-import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
+from typing import get_args
 
 import Config
+from model.command import get_command
 from model.logger import logger
 from model.message_sender import GroupSender
 from model.player import Player
@@ -13,6 +14,8 @@ from .DOTA2 import (generate_message, get_last_match_id_by_short_steamID,
                     steam_id_convert_32_to_64)
 from .DotaDB import DotaDB as DB
 
+class Dota2WatcherError(Exception):
+	pass
 
 class Watcher(Plugin):
 	"""
@@ -94,11 +97,6 @@ class Watcher(Plugin):
 	def remove_watch(self, index: int):
 		try:
 			shortID = self.playerList[index - 1].short_steamID
-		except Exception as e:
-			logger.error('Remove Watch Error Index: {}'.format(repr(e)))
-			self.sender.send('请输入正确的序号！')
-			return
-		try:
 			if self.db.is_player_stored(shortID):
 				self.db.delete_info(shortID)
 			del self.playerList[index - 1]
@@ -126,29 +124,35 @@ class Watcher(Plugin):
 
 	def handle(self, data: dict) -> bool:
 		m = data['Content']
-		if re.match(r'^[！!]查看监视$', m):
-			self.show_watch()
-			return True
-		elif re.match(r'^[!！]移除监视\s+\S+', m):
-			try:
-				s = str(re.match(r'^[!！]移除监视\s+\S+', m)[0])
-				index = int(re.split(r'\s+', s)[1])
-				self.remove_watch(index)
-			except Exception as e:
-				logger.error('Remove Watch Error Argument: {}'.format(repr(e)))
-				self.sender.send('请输入正确的参数！')
-			finally: return True
-		elif re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m):
-			try:
-				s = str(re.match(r'^[!！]添加监视\s+\S+\s+\S+\s+\S+', m)[0])
-				# print(s)
-				_, nickname, steamID, qqid = re.split(r'\s+', s)
-				# print(nickname, steamID, qqid)
-				self.add_watch(nickname, int(steamID), int(qqid))
-			except Exception as e:
-				logger.error('Add Watch Error Argument: {}'.format(repr(e)))
-				self.sender.send('请输入正确的参数！')
-			finally: return True
+		try:
+			_, ok = get_command('查看监视', [], m)
+			if ok:
+				self.show_watch()
+				return True
+		except Exception as e:
+			logger.error(Dota2WatcherError(e))
+
+		try:
+			args, ok = get_command('移除监视', [int], m)
+			if ok:
+				[index] = args
+				if index in range(1, len(self.playerList)+1):
+					self.remove_watch(index)
+				else:
+					self.sender.send('请输入正确的参数！')
+					logger.error(Dota2WatcherError('Wrong argument in remove watch'))
+				return True
+		except Exception as e:
+			logger.error(Dota2WatcherError(e))
+
+		try:
+			args, ok = get_command('添加监视', [str, int, int], m)
+			if ok:
+				[nickname, steamid, qqid] = args
+				self.add_watch(nickname, steamid, qqid)
+				return True
+		except Exception as e:
+			logger.error(Dota2WatcherError(e))
 
 		return False
 

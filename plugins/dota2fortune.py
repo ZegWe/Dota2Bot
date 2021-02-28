@@ -1,8 +1,9 @@
 import datetime
 import random
-import re
 
 import pytz
+from model.command import get_command
+from model.logger import logger
 from model.message_sender import GroupSender
 from model.plugin import Plugin
 
@@ -42,6 +43,9 @@ class User:
 		self.sentence = sentence
 		self.upd_date = get_date()
 
+class Dota2FortuneError(Exception):
+	pass
+
 class Fortune(Plugin):
 	__name = "DOTA2每日运势"
 	def __init__(self, group_id: int, sender: GroupSender):
@@ -54,10 +58,14 @@ class Fortune(Plugin):
 	
 	def handle(self, data: dict) -> bool:
 		m = data['Content']
-		if re.match(r'^[！!]今日运势$', m):
-			message = self.get_fortune(data['FromUserId'])
-			self.sender.send(message)
-			return True
+		try:
+			_, ok = get_command('今日运势', [], m)
+			if ok:
+				message = self.get_fortune(data['FromUserId'])
+				self.sender.send(message)
+				return True
+		except Exception as e:
+			logger.error(Dota2FortuneError(e))
 		return False
 
 	def get_fortune(self, FromUserId) -> str:

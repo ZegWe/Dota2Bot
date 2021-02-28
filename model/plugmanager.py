@@ -1,5 +1,4 @@
 import random
-import re
 
 import Config
 from plugins import PLUGIN_DICT
@@ -8,6 +7,7 @@ from .db import BaseDB
 from .logger import logger
 from .message_sender import GroupSender
 from .plugin import Plugin
+from .command import get_command
 
 NoCommandmessages : list[str] = [
 	'你说啥玩意儿？',
@@ -34,34 +34,52 @@ class PluginManager(object):
 
 	def handle(self, data: dict):
 		m = data['Content']
-		if re.match(r'^[！!]插件列表$', m) or re.match(r'^[！!]启用插件$', m) or re.match(r'^[！!]禁用插件$', m):
-			self.show_plugins()
-			return
-		elif re.match(r'^[！!]启用插件\s+\S+', m):
-			try:
-				s = str(re.match(r'^[！!]启用插件\s+\S+', m)[0])
-				index = int(re.split(r'\s+', s)[1])
-				self.enable_plugin(index)
-			except TypeError as e:
-				logger.error('Argument Error: {}'.format(e))
-				self.sender.send('请输入正确的参数！')
-			return
-		elif re.match(r'^[！!]禁用插件\s+\S+', m):
-			try:
-				s = str(re.match(r'^[！!]禁用插件\s+\S+', m)[0])
-				index = int(re.split(r'\s+', s)[1])
-				self.disable_plugin(index)
-			except TypeError as e:
-				logger.error('Argument Error: {}'.format(e))
-				self.sender.send('请输入正确的参数！')
-			return
-		else:
-			for plugin in self.plugins:
-				if plugin.On():
-					if plugin.handle(data):
-						return
-		if re.match(r'^[!！]', m):
-			self.sender.send(random.choice(NoCommandmessages))
+		try:
+			_, ok = get_command('插件列表',[], m)
+			if ok:
+				self.show_plugins()
+				return
+		except Exception as e:
+			logger.error(e)
+
+		try:
+			args, ok = get_command('启用插件', [int], m)
+			if ok:
+				[index] = args
+				if index in range(1,len(self.plugins)+1):
+					self.enable_plugin(index)
+				else:
+					self.sender.send('请输入正确的参数！')
+					logger.error('Argument Error: Wrong index when enable plugin.')
+				return
+		except Exception as e:
+			logger.error(e)
+
+		try:
+			args, ok = get_command('禁用插件', [int], m)
+			if ok:
+				[index] = args
+				if index in range(1,len(self.plugins)+1):
+					self.disable_plugin(index)
+				else:
+					self.sender.send('请输入正确的参数！')
+					logger.error('Argument Error: Wrong index when disable plugin.')
+				return
+		except Exception as e:
+			logger.error(e)
+
+		for plugin in self.plugins:
+			if plugin.On():
+				if plugin.handle(data):
+					return
+
+		try:
+			_, ok = get_command(r'\S+', [], m)
+			if ok:
+				self.sender.send(random.choice(NoCommandmessages))
+				return
+		except Exception as e:
+			logger.error(e)
 
 
 	def add_plugin(self, plugin_name: str, status: bool):

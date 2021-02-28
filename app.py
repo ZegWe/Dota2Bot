@@ -17,6 +17,8 @@ def connect():
 @sio.event
 def OnGroupMsgs(data):
 	message_data = data['CurrentPacket']['Data']
+	if message_data['FromUserId'] == Config.bot_id:
+		return
 	from_group = message_data['FromGroupId']
 	if from_group not in managers:
 		return
