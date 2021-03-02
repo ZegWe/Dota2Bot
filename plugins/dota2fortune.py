@@ -6,6 +6,7 @@ from model.command import get_command
 from model.logger import logger
 from model.message_sender import GroupSender
 from model.plugin import Plugin
+from model.dict import HEROES_LIST_CHINESE as Heroes
 
 fortuneDict : dict[str, list[str]] = {
 	'大吉': [
@@ -33,15 +34,32 @@ fortuneDict : dict[str, list[str]] = {
 	]
 }
 
+heroDict : list = [
+	'有必选，选必赢！',
+	'快去尝试一下吧！',
+	'要不要试试呢？'
+]
+
 def get_date() -> datetime.date:
 	tz = pytz.timezone('Asia/Shanghai')
 	return datetime.datetime.now(tz).date()
 
-class User:
+class Fort:
 	def __init__(self, fort: str, sentence: str):
 		self.fort = fort
 		self.sentence = sentence
 		self.upd_date = get_date()
+
+class Hero:
+	def __init__(self, hero: str, sentence: str):
+		self.hero = hero
+		self.sentence = sentence
+		self.upd_date = get_date()
+
+class User:
+	def __init__(self, fort: Fort = None, hero: Hero = None) -> None:
+		self.fort = fort
+		self.hero = hero
 
 class Dota2FortuneError(Exception):
 	pass
@@ -66,21 +84,47 @@ class Fortune(Plugin):
 				return True
 		except Exception as e:
 			logger.error(Dota2FortuneError(e))
+		
+		try:
+			_, ok = get_command('幸运英雄', [], m)
+			if ok:
+				message = self.get_hero(data['FromUserId'])
+				self.sender.send(message)
+				return True
+		except Exception as e:
+			logger.error(Dota2FortuneError(e))
 		return False
 
-	def get_fortune(self, FromUserId) -> str:
+	def get_hero(self, FromUserId: int) -> str:
 		if FromUserId in self.users:
 			tmp_user = self.users[FromUserId]
-			if tmp_user.upd_date != get_date():
+			if not tmp_user.hero or tmp_user.hero.upd_date != get_date():
+				tmp = random.sample(Heroes.keys(), 1)[0]
+				sentence = random.choice(heroDict)
+				tmp_user = User(tmp_user.fort, Hero(Heroes[tmp], sentence))
+				self.users[FromUserId] = tmp_user
+		else:
+			tmp = random.sample(Heroes.keys(), 1)[0]
+			sentence = random.choice(heroDict)
+			tmp_user = User(hero=Hero(Heroes[tmp], sentence))
+			self.users[FromUserId] = tmp_user
+		
+		m = '[ATUSER({})]的今日幸运英雄是{}，{}'.format(FromUserId, tmp_user.hero.hero, tmp_user.hero.sentence)
+		return m
+
+	def get_fortune(self, FromUserId: int) -> str:
+		if FromUserId in self.users:
+			tmp_user = self.users[FromUserId]
+			if not tmp_user.fort or tmp_user.fort.upd_date != get_date():
 				tmp = random.sample(fortuneDict.keys(), 1)[0]
-				tmp_user = User(tmp, random.choice(fortuneDict[tmp]))
+				tmp_user = User(Fort(tmp, random.choice(fortuneDict[tmp])),tmp_user.hero)
 				self.users[FromUserId] = tmp_user
 		else:
 			tmp = random.sample(fortuneDict.keys(), 1)[0]
-			tmp_user = User(tmp, random.choice(fortuneDict[tmp]))
+			tmp_user = User(Fort(tmp, random.choice(fortuneDict[tmp])))
 			self.users[FromUserId] = tmp_user
 
-		m = '[ATUSER({})] 的今日运势：\n\n'.format(str(FromUserId))
-		m += '{}\n\n'.format(tmp_user.fort)
-		m += tmp_user.sentence
+		m = '[ATUSER({})]的今日运势：\n\n'.format(FromUserId)
+		m += '{}\n\n'.format(tmp_user.fort.fort)
+		m += tmp_user.fort.sentence
 		return m

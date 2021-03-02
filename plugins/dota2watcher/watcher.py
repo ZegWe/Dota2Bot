@@ -1,7 +1,6 @@
 import time
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
-from typing import get_args
 
 import Config
 from model.command import get_command
@@ -10,9 +9,10 @@ from model.message_sender import GroupSender
 from model.player import Player
 from model.plugin import Plugin
 
-from .DOTA2 import (generate_message, get_last_match_id_by_short_steamID,
-                    steam_id_convert_32_to_64)
 from .DotaDB import DotaDB as DB
+from .utils import (generate_message, get_last_match_id_by_short_steamID,
+                    steam_id_convert_32_to_64)
+
 
 class Dota2WatcherError(Exception):
 	pass
