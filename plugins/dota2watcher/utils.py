@@ -8,7 +8,7 @@ from model.dict import *
 from model.logger import logger
 from model.player import Player
 
-from .Message import Messages
+from .messages import Messages
 
 
 # 异常处理
