@@ -1,6 +1,10 @@
 import re
 from .logger import logger
 
+class Command:
+	def __init__(self) -> None:
+		pass
+
 def get_command(command: str, return_list: list, s: str) -> tuple[list, bool]:
 	ret = []
 	r = re.compile(r'^[!！]{}(\s+\S+)*'.format(command))
