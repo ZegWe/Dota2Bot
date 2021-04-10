@@ -35,11 +35,11 @@ class MsgSender:
 
 	def send(self, message: str):
 		delta = datetime.timedelta(seconds=1.1)
+		data = self._get_data(message)
 		send_time = get_time()
 		if send_time - self.get_last_time() < delta:
 			time.sleep((self.get_last_time() + delta - send_time).total_seconds())
 		try:
-			data = self._get_data(message)
 			r = requests.post(self.url + "?qq=" + str(self.qid) + "&funcname=SendMsgV2", json.dumps(data))
 			if json.loads(r.text).get('Ret') == 241:
 				logger.warning("Message sending failed, resending now...\n{}".format(r.text))
@@ -51,7 +51,7 @@ class MsgSender:
 				return
 			logger.success("Message sending succeeded.\n{}".format(data))
 		except Exception as e:
-			logger.error("Post request error.\n{}".format(repr(e)))
+			logger.error("Post request error: {}\n{}".format(repr(e), data))
 
 class GroupSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):

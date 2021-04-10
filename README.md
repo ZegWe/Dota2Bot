@@ -51,6 +51,8 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 
 `!今日运势`: Today's fortune of Dota2
 
+`!幸运英雄`: Today's lucky hero
+
 ## [Quick start](#quick-start)
 
 ### [Prepare](#prepare)

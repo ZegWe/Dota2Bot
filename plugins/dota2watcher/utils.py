@@ -4,10 +4,11 @@ import random
 import Config
 import pytz
 import requests
+from model.dict import *
 from model.logger import logger
 from model.player import Player
 
-from .DOTA2_dicts import *
+from .messages import Messages
 
 
 # 异常处理
