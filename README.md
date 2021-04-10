@@ -35,9 +35,13 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 
 `!插件列表`: List all the plugins and their status(On or Off).
 
-`!启用插件 [index]`: Enable a plugin by its `index` in the list
+`!启用插件 [index]`: Enable a plugin by its `index` in the list.
 
-`!禁用插件 [index]`: Disable a plugin by its `index` in the list
+`!禁用插件 [index]`: Disable a plugin by its `index` in the list.
+
+`!帮助`: Display help content.
+
+`!插件帮助 [plugin_name]`: Display help content for a given plugin.
 
 ### [Dota2Watcher](#dota2watcher)
 
@@ -45,13 +49,13 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 
 `!添加监视 [nickname] [steam_id] [QQ account id]`: Add a player to be watched, by `nickname`, `steam_id` and `QQ account id`.
 
-`!移除监视 [index]`: Remove a player from the watching list by its `index`
+`!移除监视 [index]`: Remove a player from the watching list by its `index`.
 
 ### [Dota2Fortune](#dota2fortune)
 
-`!今日运势`: Today's fortune of Dota2
+`!今日运势`: Today's fortune of Dota2.
 
-`!幸运英雄`: Today's lucky hero
+`!幸运英雄`: Today's lucky hero.
 
 ## [Quick start](#quick-start)
 
@@ -165,6 +169,6 @@ python app.py
 To develop your own plugin, you should follow these rules:
 
 1. Your plugin should be a subclass of [`Plugin`](/model/plugin.py) in the model folder.
-2. It should implement a `handle` method as the command handler. You can reference other plugins in [plugins](/plugins) folder.
+2. Add your command in the `__init__` method. You can reference other plugins in [plugins](/plugins) folder.
 3. Put your plugin file/folder into the [plugins](/plugins) folder, and import it in the [\_\_init__.py](/plugins/__init__.py) file.
 4. Add your plugin in [app.py](/app.py) by `add_plugin` method.

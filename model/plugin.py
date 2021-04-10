@@ -1,6 +1,6 @@
 from .logger import logger
 from .message_sender import GroupSender
-
+from .command import Command
 
 class Plugin(object):
 	"""
@@ -12,6 +12,7 @@ class Plugin(object):
 		self.group_id : int = group_id
 		self._on : bool = False
 		self.sender : GroupSender = sender
+		self.commands : list[Command] = []
 
 	@classmethod
 	def get_name(cls) -> str:
@@ -26,5 +27,16 @@ class Plugin(object):
 	def shutdown(self):
 		logger.debug('Plugin {} shutdown.'.format(self.get_name()))
 
+	def show_help(self):
+		m = '{}：'.format(self.get_name())
+		for com in self.commands:
+			m += '\n · {} {}'.format(com.command, com.help)
+		self.sender.send(m)
+
 	def handle(self, data: dict):
-		pass
+		m = data['Content']
+		user = int(data['FromUserId'])
+		for com in self.commands:
+			if com.run(m, user):
+				return True
+		return False

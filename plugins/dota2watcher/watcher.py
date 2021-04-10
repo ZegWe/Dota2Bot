@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
 import Config
-from model.command import get_command
+from model.command import Command
 from model.logger import logger
 from model.message_sender import GroupSender
 from model.player import Player
@@ -13,9 +13,6 @@ from .DotaDB import DotaDB as DB
 from .utils import (generate_message, get_last_match_id_by_short_steamID,
                     steam_id_convert_32_to_64)
 
-
-class Dota2WatcherError(Exception):
-	pass
 
 class Watcher(Plugin):
 	"""
@@ -33,7 +30,10 @@ class Watcher(Plugin):
 		for player in self.playerList:
 			player = self.update_player(player)
 		self.running = True
-		t = self.pool.submit(self.update)
+		self.pool.submit(self.update)
+		self.commands.append(Command('查看监视', [], '： 查看监视列表', self.show_watch))
+		self.commands.append(Command('添加监视', [str, int, int], '昵称 Steam账号 QQ号： 添加新的监视账号', self.add_watch))
+		self.commands.append(Command('移除监视', [int], '序号： 移除指定的监视账号', self.remove_watch))
 		logger.debug('Dota2 Watcher({}) initialized.'.format(group_id))
 
 	@classmethod
@@ -86,7 +86,7 @@ class Watcher(Plugin):
 		self.pool.shutdown()
 		super().shutdown()
 
-	def add_watch(self, nickname, shortID, qqid):
+	def add_watch(self, nickname: str, shortID: int, qqid: int, user: int):
 		if self.db.is_player_stored(shortID):
 			logger.warning('Player already watched.')
 			self.sender.send('该账号已经存在，请勿重复添加！')
@@ -98,7 +98,7 @@ class Watcher(Plugin):
 		logger.success('Player information added successfully.')
 		self.sender.send('添加监视成功！')
 
-	def remove_watch(self, index: int):
+	def remove_watch(self, index: int, user: int):
 		try:
 			shortID = self.playerList[index - 1].short_steamID
 			if self.db.is_player_stored(shortID):
@@ -111,7 +111,7 @@ class Watcher(Plugin):
 			logger.success('Remove Watch Successfully!')
 			self.sender.send('移除监视成功！')
 
-	def show_watch(self):
+	def show_watch(self, user: int):
 		# print(self.playerList)
 		if len(self.playerList) == 0:
 			m = '没有正在监视的账号！'
@@ -125,40 +125,6 @@ class Watcher(Plugin):
 				m = ''
 		if len(m):
 			self.sender.send(m)
-
-	def handle(self, data: dict) -> bool:
-		m = data['Content']
-		try:
-			_, ok = get_command('查看监视', [], m)
-			if ok:
-				self.show_watch()
-				return True
-		except Exception as e:
-			logger.error(Dota2WatcherError(e))
-
-		try:
-			args, ok = get_command('移除监视', [int], m)
-			if ok:
-				[index] = args
-				if index in range(1, len(self.playerList)+1):
-					self.remove_watch(index)
-				else:
-					self.sender.send('请输入正确的参数！')
-					logger.error(Dota2WatcherError('Wrong argument in remove watch'))
-				return True
-		except Exception as e:
-			logger.error(Dota2WatcherError(e))
-
-		try:
-			args, ok = get_command('添加监视', [str, int, int], m)
-			if ok:
-				[nickname, steamid, qqid] = args
-				self.add_watch(nickname, steamid, qqid)
-				return True
-		except Exception as e:
-			logger.error(Dota2WatcherError(e))
-
-		return False
 
 def test():
 	Config.Load('./config.json')

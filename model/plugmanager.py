@@ -7,7 +7,7 @@ from .db import BaseDB
 from .logger import logger
 from .message_sender import GroupSender
 from .plugin import Plugin
-from .command import get_command
+from .command import Command
 
 NoCommandmessages : list[str] = [
 	'你说啥玩意儿？',
@@ -30,57 +30,45 @@ class PluginManager(object):
 			new_plugin : Plugin = PLUGIN_DICT[plugin_name](group_id, self.sender)
 			new_plugin.Set(pluginlist[plugin_name])
 			self.plugins.append(new_plugin)
+		self.commands : list[Command] = []
+		self.commands.append(Command('插件列表', [], '： 显示插件列表', self.show_plugins))
+		self.commands.append(Command('启用插件', [int], '序号： 启用指定插件', self.enable_plugin))
+		self.commands.append(Command('禁用插件', [int], '序号： 禁用指定插件', self.disable_plugin))
+		self.commands.append(Command('帮助', [], '： 显示本帮助', self.show_help))
+		self.commands.append(Command('插件帮助', [str], '插件名： 显示指定插件的帮助', self.plugin_help))
+		self.random = Command(r'\S+', [], '', self.no_command)
 		logger.success('Plugin Manager({}) Initialized.'.format(group_id))
 
 	def handle(self, data: dict):
 		m = data['Content']
-		try:
-			_, ok = get_command('插件列表',[], m)
-			if ok:
-				self.show_plugins()
-				return
-		except Exception as e:
-			logger.error(e)
-
-		try:
-			args, ok = get_command('启用插件', [int], m)
-			if ok:
-				[index] = args
-				if index in range(1,len(self.plugins)+1):
-					self.enable_plugin(index)
-				else:
-					self.sender.send('请输入正确的参数！')
-					logger.error('Argument Error: Wrong index when enable plugin.')
-				return
-		except Exception as e:
-			logger.error(e)
-
-		try:
-			args, ok = get_command('禁用插件', [int], m)
-			if ok:
-				[index] = args
-				if index in range(1,len(self.plugins)+1):
-					self.disable_plugin(index)
-				else:
-					self.sender.send('请输入正确的参数！')
-					logger.error('Argument Error: Wrong index when disable plugin.')
-				return
-		except Exception as e:
-			logger.error(e)
+		user = int(data['FromUserId'])
 
 		for plugin in self.plugins:
 			if plugin.On():
 				if plugin.handle(data):
 					return
 
-		try:
-			_, ok = get_command(r'\S+', [], m)
-			if ok:
-				self.sender.send(random.choice(NoCommandmessages))
+		for com in self.commands:
+			if com.run(m, user):
 				return
-		except Exception as e:
-			logger.error(e)
+		
+		self.random.run(m, user)
 
+	def show_help(self, user: int):
+		m = '帮助：'
+		for com in self.commands:
+			m += '\n · {} {}'.format(com.command, com.help)
+		self.sender.send(m)
+
+	def plugin_help(self, name: str, user: int):
+		for plugin in self.plugins:
+			if plugin.get_name() == name:
+				plugin.show_help()
+				return
+		self.sender.send('未找到该插件！')
+
+	def no_command(self, user: int):
+		self.sender.send(random.choice(NoCommandmessages))
 
 	def add_plugin(self, plugin_name: str, status: bool):
 		if PLUGIN_DICT.get(plugin_name, 0) == 0:
@@ -94,7 +82,7 @@ class PluginManager(object):
 		self.plugins.append(new_plugin)
 		self.db.insert_info(plugin_name, status)
 
-	def show_plugins(self):
+	def show_plugins(self, user: int):
 		m = '插件列表：'
 		for index, plugin in enumerate(self.plugins):
 			m += '\n{}. {}: {}'.format(index + 1, plugin.get_name(), '✅' if plugin.On() else '❌')
@@ -102,7 +90,7 @@ class PluginManager(object):
 			m = '没有可用插件！'
 		self.sender.send(m)
 
-	def enable_plugin(self, index: int):
+	def enable_plugin(self, index: int, user: int):
 		try:
 			self.plugins[index - 1].Set(True)
 			self.db.update_info(self.plugins[index-1].get_name(), True)
@@ -113,7 +101,7 @@ class PluginManager(object):
 			logger.success('Plugin {} Enabled!'.format(self.plugins[index - 1].get_name()))
 			self.sender.send('插件 {} 已启用'.format(self.plugins[index - 1].get_name()))
 
-	def disable_plugin(self, index: int):
+	def disable_plugin(self, index: int, user: int):
 		try:
 			self.plugins[index - 1].Set(False)
 			self.db.update_info(self.plugins[index-1].get_name(), False)

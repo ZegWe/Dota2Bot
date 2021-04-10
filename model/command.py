@@ -2,8 +2,30 @@ import re
 from .logger import logger
 
 class Command:
-	def __init__(self) -> None:
-		pass
+	"""
+	:command: Command string
+
+	:return_list: Type of the command args. (e.g. [int, str])
+
+	:tip: Tips which would be shown in help
+	
+	:f: The function you want to call by the command
+	"""
+	def __init__(self, command: str, return_list: list, tip: str, func) -> None:
+		self.command = command
+		self.return_list = return_list
+		self.func  = func
+		self.help = tip
+
+	def run(self, m: str, user: int) -> bool:
+		try:
+			args, ok = get_command(self.command, self.return_list, m)
+			if ok:
+				self.func(*args, user)
+				return True
+		except Exception as e:
+			logger.error(e)
+		return False
 
 def get_command(command: str, return_list: list, s: str) -> tuple[list, bool]:
 	ret = []

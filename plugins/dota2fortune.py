@@ -2,8 +2,7 @@ import datetime
 import random
 
 import pytz
-from model.command import get_command
-from model.logger import logger
+from model.command import Command
 from model.message_sender import GroupSender
 from model.plugin import Plugin
 from model.dict import HEROES_LIST_CHINESE as Heroes
@@ -61,41 +60,20 @@ class User:
 		self.fort = fort
 		self.hero = hero
 
-class Dota2FortuneError(Exception):
-	pass
-
 class Fortune(Plugin):
 	__name = "DOTA2每日运势"
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__(group_id, sender)
 		self.users : dict[int, User] = {}
+		self.commands.append(Command('今日运势', [], '： 显示今日的Dota2运势', self.get_fortune))
+		self.commands.append(Command('幸运英雄', [], '： 显示今日的Dota2幸运英雄', self.get_hero))
 
 	@classmethod
 	def get_name(cls) -> str:
 		return cls.__name
 	
-	def handle(self, data: dict) -> bool:
-		m = data['Content']
-		try:
-			_, ok = get_command('今日运势', [], m)
-			if ok:
-				message = self.get_fortune(data['FromUserId'])
-				self.sender.send(message)
-				return True
-		except Exception as e:
-			logger.error(Dota2FortuneError(e))
-		
-		try:
-			_, ok = get_command('幸运英雄', [], m)
-			if ok:
-				message = self.get_hero(data['FromUserId'])
-				self.sender.send(message)
-				return True
-		except Exception as e:
-			logger.error(Dota2FortuneError(e))
-		return False
 
-	def get_hero(self, FromUserId: int) -> str:
+	def get_hero(self, FromUserId: int) -> None:
 		if FromUserId in self.users:
 			tmp_user = self.users[FromUserId]
 			if not tmp_user.hero or tmp_user.hero.upd_date != get_date():
@@ -110,9 +88,9 @@ class Fortune(Plugin):
 			self.users[FromUserId] = tmp_user
 		
 		m = '[ATUSER({})]的今日幸运英雄是{}，{}'.format(FromUserId, tmp_user.hero.hero, tmp_user.hero.sentence)
-		return m
+		self.sender.send(m)
 
-	def get_fortune(self, FromUserId: int) -> str:
+	def get_fortune(self, FromUserId: int) -> None:
 		if FromUserId in self.users:
 			tmp_user = self.users[FromUserId]
 			if not tmp_user.fort or tmp_user.fort.upd_date != get_date():
@@ -127,4 +105,4 @@ class Fortune(Plugin):
 		m = '[ATUSER({})]的今日运势：\n\n'.format(FromUserId)
 		m += '{}\n\n'.format(tmp_user.fort.fort)
 		m += tmp_user.fort.sentence
-		return m
+		self.sender.send(m)
