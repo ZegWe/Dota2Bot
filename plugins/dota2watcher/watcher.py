@@ -74,7 +74,11 @@ class Watcher(Plugin):
 				for match_id in self.result:
 					for message in generate_message(match_id, self.result[match_id]):
 						self.sender.send(message)
-			time.sleep(300)
+			for i in range(300):
+				if self.running:
+					time.sleep(1)
+				else:
+					break
 		logger.debug('Watching Loop exited: {}'.format(self.group_id))
 
 	def shutdown(self):
