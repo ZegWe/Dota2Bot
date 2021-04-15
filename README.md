@@ -127,7 +127,7 @@ cp config.example.json config.json
 vim config.json
 ```
 
-Create `botInfo.db.db` file.
+Create `botInfo.db` file.
 
 ```bash
 touch botInfo.db
