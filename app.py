@@ -22,8 +22,7 @@ def OnGroupMsgs(data):
 	from_group = message_data['FromGroupId']
 	if from_group not in managers:
 		return
-	manager = managers[from_group]
-	manager.handle(message_data)
+	managers[from_group].handle(message_data)
 
 @sio.event
 def OnFriendMsgs(data):
