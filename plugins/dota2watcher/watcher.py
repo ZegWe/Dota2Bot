@@ -31,9 +31,9 @@ class Watcher(Plugin):
 			player = self.update_player(player)
 		self.running = True
 		self.pool.submit(self.update)
-		self.commands.append(Command('查看监视', [], '： 查看监视列表', self.show_watch))
-		self.commands.append(Command('添加监视', [str, int, int], '昵称 Steam账号 QQ号： 添加新的监视账号', self.add_watch))
-		self.commands.append(Command('移除监视', [int], '序号： 移除指定的监视账号', self.remove_watch))
+		self.commands.append(Command(['查看监视'], [], '： 查看监视列表', self.show_watch))
+		self.commands.append(Command(['添加监视'], [str, int, int], '昵称 Steam账号 QQ号： 添加新的监视账号', self.add_watch))
+		self.commands.append(Command(['移除监视'], [int], '序号： 移除指定的监视账号', self.remove_watch))
 		logger.debug('Dota2 Watcher({}) initialized.'.format(group_id))
 
 	@classmethod

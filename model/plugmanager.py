@@ -31,12 +31,12 @@ class PluginManager(object):
 			new_plugin.Set(pluginlist[plugin_name])
 			self.plugins.append(new_plugin)
 		self.commands : list[Command] = []
-		self.commands.append(Command('插件列表', [], '： 显示插件列表', self.show_plugins))
-		self.commands.append(Command('启用插件', [int], '序号： 启用指定插件', self.enable_plugin))
-		self.commands.append(Command('禁用插件', [int], '序号： 禁用指定插件', self.disable_plugin))
-		self.commands.append(Command('帮助', [], '： 显示本帮助', self.show_help))
-		self.commands.append(Command('插件帮助', [str], '插件名： 显示指定插件的帮助', self.plugin_help))
-		self.random = Command(r'\S+', [], '', self.no_command)
+		self.commands.append(Command(['插件列表'], [], '： 显示插件列表', self.show_plugins))
+		self.commands.append(Command(['启用插件'], [int], '序号： 启用指定插件', self.enable_plugin))
+		self.commands.append(Command(['禁用插件'], [int], '序号： 禁用指定插件', self.disable_plugin))
+		self.commands.append(Command(['帮助'], [], '： 显示本帮助', self.show_help))
+		self.commands.append(Command(['插件帮助'], [str], '插件名： 显示指定插件的帮助', self.plugin_help))
+		self.random = Command([r'\S+'], [], '', self.no_command)
 		logger.success('Plugin Manager({}) Initialized.'.format(group_id))
 
 	def handle(self, data: dict):
@@ -57,7 +57,7 @@ class PluginManager(object):
 	def show_help(self, user: int):
 		m = '帮助：'
 		for com in self.commands:
-			m += '\n · {} {}'.format(com.command, com.help)
+			m += '\n · {} {}'.format(com.commands, com.help)
 		self.sender.send(m)
 
 	def plugin_help(self, name: str, user: int):
