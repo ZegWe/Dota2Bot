@@ -3,7 +3,7 @@ from .logger import logger
 
 class Command:
 	"""
-	:commands: Command string or list
+	:commands: Command string list
 
 	:return_list: Type of the command args. (e.g. [int, str])
 
