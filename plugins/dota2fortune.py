@@ -87,7 +87,7 @@ class Fortune(Plugin):
 			tmp_user = User(hero=Hero(Heroes[tmp], sentence))
 			self.users[FromUserId] = tmp_user
 		
-		m = '[GETUSERNICK({})]的今日幸运英雄是{}，{}'.format(FromUserId, tmp_user.hero.hero, tmp_user.hero.sentence)
+		m = '[ATUSER({})]的今日幸运英雄是{}，{}'.format(FromUserId, tmp_user.hero.hero, tmp_user.hero.sentence)
 		self.sender.send(m)
 
 	def get_fortune(self, FromUserId: int) -> None:
@@ -102,7 +102,7 @@ class Fortune(Plugin):
 			tmp_user = User(Fort(tmp, random.choice(fortuneDict[tmp])))
 			self.users[FromUserId] = tmp_user
 
-		m = '[GETUSERNICK({})]的今日运势：\n\n'.format(FromUserId)
+		m = '[ATUSER({})]的今日运势：\n\n'.format(FromUserId)
 		m += '{}\n\n'.format(tmp_user.fort.fort)
 		m += tmp_user.fort.sentence
 		self.sender.send(m)
