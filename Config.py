@@ -22,7 +22,7 @@ def Load(config_dir: str):
 		debug = config['debug']
 		init_logger(debug)
 		if "dicts" in config.keys():
-			with open(config["dicts"], 'r', encoding='UTF-*') as f:
+			with open(config["dicts"], 'r', encoding='UTF-8') as f:
 				dicts = json.load(f)
 				replace(dicts)
 	except Exception:
