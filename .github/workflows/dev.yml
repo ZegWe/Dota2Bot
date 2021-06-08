@@ -6,7 +6,7 @@ name: dev
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   release:
-    branches: [ dev ]
+    branches: [ new, dev ]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
