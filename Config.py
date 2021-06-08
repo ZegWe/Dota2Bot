@@ -15,8 +15,8 @@ def Load(config_dir: str):
 		config : dict = json.load(open(config_dir, 'r', encoding='UTF-8'))
 		global api_key, sio_url, post_url, bot_id, groups, debug
 		api_key = config['api_key']
-		post_url = config['opq_url']
-		sio_url = config['ws_url']
+		sio_url = config['opq_url']
+		post_url = sio_url+'/v1/LuaApiCaller'
 		bot_id = config['bot_qq']
 		groups = config['groups']
 		debug = config['debug']

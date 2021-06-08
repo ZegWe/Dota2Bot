@@ -99,8 +99,7 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 	"api_key": "xxxxx",
 	"bot_qq": 1234567890,
 	"groups": [1234567890],
-	"opq_url": "http://127.0.0.1:8080/v1/LuaApiCaller",
-	"ws_url": "http://127.0.0.1:8080",
+	"opq_url": "http://127.0.0.1:8080",
 	"debug": false
 }
 ```

@@ -120,9 +120,6 @@ class Watcher(Plugin):
 		m = '以下账号被监视中：'
 		for index, player in enumerate(self.playerList):
 			m += '\n{}. {}({})'.format(index + 1, player.nickname, player.short_steamID)
-			if index % 8 == 6:
-				self.sender.send(m)
-				m = ''
 		if len(m):
 			self.sender.send(m)
 

@@ -173,10 +173,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	elif (win and top_kda < 4) or (not win and top_kda < 1):
 		postive = 0
 	else:
-		if random.randint(0, 1) == 0:
-			postive = 1
-		else:
-			postive = 0
+		postive = random.randint(0, 1)
 
 	print_str = random.choice(Messages[solo*4+win*2+postive]).format(print_str)
 
@@ -187,8 +184,9 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 		duration / 60, duration % 60)
 	print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
 	print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
-	# print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
-	m = [print_str]
+	print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
+	print_str += "\n"
+	# m = [print_str]
 	for i in player_list:
 		hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
 		kda = i.kda
@@ -200,7 +198,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 		damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
 		participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 		deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
-		print_str = "{}使用{}, KDA: {:.2f}[{}/{}/{}], GPM/XPM: {}/{}, 补刀数: {}, 总伤害: {}({:.2f}%), 参战率: {:.2f}%, 参葬率: {:.2f}%" \
+		print_str += "\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%\n" \
 			.format(i.nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
-		m.append(print_str)
-	return m
+		# m.append(print_str)
+	return [print_str]
