@@ -65,8 +65,8 @@ class Fortune(Plugin):
 	def __init__(self, group_id: int, sender: GroupSender):
 		super().__init__(group_id, sender)
 		self.users : dict[int, User] = {}
-		self.commands.append(Command('今日运势', [], '： 显示今日的Dota2运势', self.get_fortune))
-		self.commands.append(Command('幸运英雄', [], '： 显示今日的Dota2幸运英雄', self.get_hero))
+		self.commands.append(Command(['今日运势', '今天啥运气'], [], '： 显示今日的Dota2运势', self.get_fortune))
+		self.commands.append(Command(['幸运英雄', '今天玩点啥', '不知道玩啥', '玩啥好呢'], [], '： 显示今日的Dota2幸运英雄', self.get_hero))
 
 	@classmethod
 	def get_name(cls) -> str:

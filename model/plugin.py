@@ -30,7 +30,7 @@ class Plugin(object):
 	def show_help(self):
 		m = '{}：'.format(self.get_name())
 		for com in self.commands:
-			m += '\n · {} {}'.format(com.command, com.help)
+			m += '\n · {} {}'.format(com.commands, com.help)
 		self.sender.send(m)
 
 	def handle(self, data: dict):

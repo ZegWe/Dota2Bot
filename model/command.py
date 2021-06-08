@@ -3,7 +3,7 @@ from .logger import logger
 
 class Command:
 	"""
-	:command: Command string
+	:commands: Command string list
 
 	:return_list: Type of the command args. (e.g. [int, str])
 
@@ -11,20 +11,21 @@ class Command:
 	
 	:func: The function you want to call by the command
 	"""
-	def __init__(self, command: str, return_list: list, tip: str, func) -> None:
-		self.command = command
+	def __init__(self, commands: list[str], return_list: list, tip: str, func) -> None:
+		self.commands = commands
 		self.return_list = return_list
 		self.func  = func
 		self.help = tip
 
 	def run(self, m: str, user: int) -> bool:
-		try:
-			args, ok = get_command(self.command, self.return_list, m)
-			if ok:
-				self.func(*args, user)
-				return True
-		except Exception as e:
-			logger.error(e)
+		for command in self.commands:
+			try:
+				args, ok = get_command(command, self.return_list, m)
+				if ok:
+					self.func(*args, user)
+					return True
+			except Exception as e:
+				logger.error(e)
 		return False
 
 def get_command(command: str, return_list: list, s: str) -> tuple[list, bool]:
