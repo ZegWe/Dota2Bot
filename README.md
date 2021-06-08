@@ -108,7 +108,7 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 Run with `Docker`.
 
 ```bash
-docker run -itd -v $(pwd)/config.json:/opt/dota2bot/config.json -v $(pwd)/botInfo.db:/opt/dota2bot/botInfo.db --name dota2bot zegwe/dota2bot:latest
+docker run -itd -v $(pwd)/config.json:/opt/bot/config.json -v $(pwd)/botInfo.db:/opt/bot/botInfo.db --name dota2bot zegwe/dota2bot:latest
 ```
 
 #### [Use git](#use-git)
@@ -127,7 +127,7 @@ cp config.example.json config.json
 vim config.json
 ```
 
-Create `botInfo.db.db` file.
+Create `botInfo.db` file.
 
 ```bash
 touch botInfo.db
