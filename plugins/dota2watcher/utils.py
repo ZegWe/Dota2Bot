@@ -30,7 +30,7 @@ def get_team_by_slot(slot: int) -> int:
 
 def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
     # get match_id
-	url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v001/?key={}' \
+	url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1?key={}' \
           '&account_id={}&matches_requested=1'.format(Config.api_key, short_steamID)
 	try:
 		response = requests.get(url)
@@ -72,8 +72,8 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 
 def get_match_detail_info(match_id: int) -> dict:
     # get match detail
-    url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/' \
-          '?key={}&match_id={}'.format(Config.api_key, match_id)
+    url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1' \
+          '?key={}&match_id={}&include_persona_names=1'.format(Config.api_key, match_id)
     try:
         response = requests.get(url)
     except requests.RequestException:
@@ -121,6 +121,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	for i in player_list:
 		for j in match['players']:
 			if i.short_steamID == j['account_id']:
+				i.persona = j['persona']
 				i.dota2_kill = j['kills']
 				i.dota2_death = j['deaths']
 				i.dota2_assist = j['assists']
@@ -199,6 +200,6 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 		participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 		deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
 		print_str += "\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%\n" \
-			.format(i.nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
+			.format(i.persona, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
 		# m.append(print_str)
 	return [print_str]

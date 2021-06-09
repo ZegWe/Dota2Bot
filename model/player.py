@@ -5,6 +5,7 @@ class Player:
 	qqid : int = 0
 	nickname : str = ''
 	last_DOTA2_match_ID : int = 0
+	persona = ''
 
     # 玩家在最新的一场比赛中的数据
     # dota2专属
