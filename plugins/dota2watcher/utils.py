@@ -185,7 +185,6 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
 	print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
 	print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
-	print_str += "\n"
 	# m = [print_str]
 	for i in player_list:
 		hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
@@ -198,7 +197,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 		damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
 		participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 		deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
-		print_str += "\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%\n" \
+		print_str += "\n\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%" \
 			.format(i.nickname, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
 		# m.append(print_str)
 	return [print_str]
