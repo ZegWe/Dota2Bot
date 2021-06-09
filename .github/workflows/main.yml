@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: buildx
+name: latest
 
 # Controls when the action will run. 
 on:
@@ -38,14 +38,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-      - name: Build and Push with Version Tag
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64,linux/arm
-          push: true
-          tags: zegwe/dota2bot:${{ env.TAG }}
-          
       - name: Build and Push with latest Tag
         uses: docker/build-push-action@v2
         with:
