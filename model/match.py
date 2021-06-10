@@ -1,4 +1,5 @@
 from typing import Union
+from .logger import logger
 
 import requests
 
@@ -60,13 +61,14 @@ class Match:
     duration : int
     start_time : int
     def __init__(self, data: dict) -> None:
+        logger.debug('match detail init')
         self.match_id = data['match_id']
         self.duration = data['duration']
         self.start_time = data['start_time']
         self.radiant_win = data['radiant_win']
         self.mode = data['game_mode']
         self.typ = data['lobby_type']
-        self.scores = [data['radiant_scroe'], data['dire_score']]
+        self.scores = [data['radiant_score'], data['dire_score']]
         self.players = []
         for p in data['players']:
             self.players.append(MatchPlayer(p))
@@ -86,7 +88,6 @@ def get_match_detail(match_id: int, api_key: str) -> Match:
                 "The server is busy or you exceeded limits. Please wait 30s and try again.")
         raise DOTA2HTTPError(
             "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
-
     match = response.json()
     try:
         match_info = match["result"]
@@ -94,5 +95,5 @@ def get_match_detail(match_id: int, api_key: str) -> Match:
         raise DOTA2HTTPError("Response Error: Key Error")
     except IndexError:
         raise DOTA2HTTPError("Response Error: Index Error")
-    
+    logger.debug('match detail')
     return Match(match_info)

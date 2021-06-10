@@ -65,6 +65,7 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 # 接收某局比赛的玩家列表, 生成战报
 # 参数为玩家对象列表和比赛ID
 def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
+	logger.debug('generating...')
 	try:
 		detail = get_match_detail(match_id, Config.api_key)
 	except DOTA2HTTPError as e:
@@ -73,7 +74,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
 
 	if detail.mode in [15]:  # 各种活动模式不通报
 		return []
-	mode = GAME_MODE[detail.mode] if detail.match_id in GAME_MODE else '未知'
+	mode = GAME_MODE[detail.mode] if detail.mode in GAME_MODE else '未知'
 
 	lobby = LOBBY[detail.typ] if detail.typ in LOBBY else '未知'
 	solo = True if len(accounts) == 1 else False

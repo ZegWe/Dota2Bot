@@ -27,6 +27,7 @@ class Watcher(Plugin):
 		self.pool = ThreadPoolExecutor(20)
 		self.lock = Lock()
 		self.accounts : list[Account] = self.db.get_accounts()
+		logger.debug(self.accounts)
 		for account in self.accounts:
 			account = self.update_account(account)
 		self.running = True
@@ -41,7 +42,7 @@ class Watcher(Plugin):
 		return cls.__name
 
 	def update_account(self, account: Account) -> Account:
-		# print(time.time())
+		logger.debug('Watcher update account')
 		try:
 			match_id = get_last_match_id_by_short_steamID(account.short_steamID)
 		except Exception as e:
@@ -58,9 +59,11 @@ class Watcher(Plugin):
 			self.lock.release()
 			self.db.update_DOTA2_match_ID(account.short_steamID, match_id)
 			account.last_DOTA2_match_ID = match_id
+		logger.debug('account update finish')
 		return account
 
 	def update(self):
+		time.sleep(1)
 		logger.debug('Watch Loop started: {}'.format(self.group_id))
 		while self.running:
 			self.result.clear()
@@ -68,13 +71,14 @@ class Watcher(Plugin):
 				time.sleep(5)
 				continue
 			if self.On():
+				logger.debug('updating...')
 				tmpList = self.pool.map(self.update_account, self.accounts)
-				
 				self.accounts = list(tmpList)
+				logger.debug(self.result)
 				for match_id in self.result:
 					for message in generate_message(match_id, self.result[match_id]):
 						self.sender.send(message)
-			for i in range(300):
+			for _ in range(300):
 				if self.running:
 					time.sleep(1)
 				else:
