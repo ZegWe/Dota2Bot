@@ -19,6 +19,7 @@ class Player:
 	xpm : int = 0
 	hero : int = 0
 	last_hit : int = 0
+	denies : int = 0
 	damage : int = 0
 
 	def __init__(self, nickname: str, qqid: int, short_steamID: int, long_steamID: int, last_DOTA2_match_ID: int):

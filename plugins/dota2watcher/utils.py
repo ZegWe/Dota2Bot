@@ -129,6 +129,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 				i.dota2_team = get_team_by_slot(j['player_slot'])
 				i.hero = int(j['hero_id'])
 				i.last_hit = j['last_hits']
+				i.denies = j['denies']
 				i.damage = j['hero_damage']
 				i.gpm = j['gold_per_min']
 				i.xpm = j['xp_per_min']
@@ -190,8 +191,8 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 	# m = [print_str]
 	for i in player_list:
 		hero = HEROES_LIST_CHINESE[i.hero] if i.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
-		kda = i.kda
-		last_hits = i.last_hit
+		persona, kda = i.persona, i.kda
+		last_hits, denies = i.last_hit, i.denies
 		damage = i.damage
 		kills, deaths, assists = i.dota2_kill, i.dota2_death, i.dota2_assist
 		gpm, xpm = i.gpm, i.xpm
@@ -199,7 +200,7 @@ def generate_message(match_id: int, player_list: list[Player]) -> list[str]:
 		damage_rate = 0 if team_damage == 0 else (100 * (float(damage) / team_damage))
 		participation = 0 if team_kills == 0 else (100 * float(kills + assists) / team_kills)
 		deaths_rate = 0 if team_deaths == 0 else (100 * float(deaths) / team_deaths)
-		print_str += "\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%\n" \
-			.format(i.persona, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, damage, damage_rate, participation, deaths_rate)
+		print_str += "\n{}使用{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n补刀数: {}/{}\n总伤害: {}({:.2f}%)\n参战率: {:.2f}%\n参葬率: {:.2f}%\n" \
+			.format(persona, hero, kda, kills, deaths, assists, gpm, xpm, last_hits, denies, damage, damage_rate, participation, deaths_rate)
 		# m.append(print_str)
 	return [print_str]
