@@ -88,7 +88,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
 				break
     # 队伍信息
 	scores = detail.scores
-	radiant = detail.players[0].radiant
+	radiant = players[0].radiant
 	if not radiant: scores.reverse()
 
 	team_damage = sum([x.damage for x in detail.players if x.radiant == radiant])
