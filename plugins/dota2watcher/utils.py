@@ -72,7 +72,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
 		logger.error(e)
 		return ["DOTA2战报生成失败"]
 
-	if detail.mode in [15]:  # 各种活动模式不通报
+	if detail.mode in [15, 19]:  # 各种活动模式不通报
 		return []
 	mode = GAME_MODE[detail.mode] if detail.mode in GAME_MODE else '未知'
 
