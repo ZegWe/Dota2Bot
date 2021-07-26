@@ -114,7 +114,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
 
 	start_time = datetime.datetime.fromtimestamp(detail.start_time, tz=pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S")
 	print_str += "\n开始时间: {}".format(start_time)
-	print_str += "\n持续时间: {:.0f}:{:.0f}".format(
+	print_str += "\n持续时间: {:.0f}:{:02.0f}".format(
 		detail.duration / 60, detail.duration % 60)
 	print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
 	print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
