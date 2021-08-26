@@ -118,7 +118,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
 		detail.duration / 60, detail.duration % 60)
 	print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
 	print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
-	print_str += "\n战绩详情: https://zh.dotabuff.com/matches/{}".format(match_id)
+	print_str += "\n战绩详情: https://www.dotabuff.com/matches/{}".format(match_id)
 	for player in players:
 		hero = HEROES_LIST_CHINESE[player.hero] if player.hero in HEROES_LIST_CHINESE else '不知道什么鬼'
 		persona, kda = player.persona, player.kda
