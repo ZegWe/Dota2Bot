@@ -19,11 +19,18 @@ class MsgSender:
 		self.qid: int = qid
 		self.to: int = to
 		self._data: dict = {}
+		self._image_data: dict = {}
 
 	def _get_data(self, message: str) -> dict:
 		tmp = self._data
 		tmp["Content"] = message
 		return tmp
+
+	def _get_image_data(self, url: str) -> dict:
+		tmp = self._image_data
+		tmp["PicUrl"] = url
+		return tmp
+
 
 	@classmethod
 	def get_last_time(cls) -> datetime.datetime:
@@ -34,8 +41,15 @@ class MsgSender:
 		cls.__last_time = time
 
 	def send(self, message: str):
-		delta = datetime.timedelta(seconds=1.1)
 		data = self._get_data(message)
+		self.send_data(data)
+
+	def send_image(self, url: str):
+		data = self._get_image_data(url)
+		self.send_data(data)
+
+	def send_data(self, data: dict):
+		delta = datetime.timedelta(seconds=1.1)
 		send_time = get_time()
 		if send_time - self.get_last_time() < delta:
 			time.sleep((self.get_last_time() + delta - send_time).total_seconds())
@@ -63,6 +77,13 @@ class GroupSender(MsgSender):
 				"Content": ""
 			}
 
+		self._image_data = {
+				"ToUserUid": self.to,
+				"SendToType": 2,
+				"SendMsgType": "PicMsg",
+				"PicUrl": ""
+			}
+
 class FriendSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
 		super().__init__(url, qid, to)
@@ -71,4 +92,11 @@ class FriendSender(MsgSender):
 				"SendToType": 1,
 				"SendMsgType": "TextMsg",
 				"Content": ""
+			}
+
+		self._image_data = {
+				"ToUserUid": self.to,
+				"SendToType": 1,
+				"SendMsgType": "PicMsg",
+				"PicUrl": ""
 			}
