@@ -44,19 +44,19 @@ def get_date() -> datetime.date:
 	return datetime.datetime.now(tz).date()
 
 class Fort:
-	def __init__(self, fort: str, sentence: str):
+	def __init__(self, fort: str = "", sentence: str = ""):
 		self.fort = fort
 		self.sentence = sentence
 		self.upd_date = get_date()
 
 class Hero:
-	def __init__(self, hero: str, sentence: str):
+	def __init__(self, hero: str = "", sentence: str = ""):
 		self.hero = hero
 		self.sentence = sentence
 		self.upd_date = get_date()
 
 class User:
-	def __init__(self, fort: Fort = None, hero: Hero = None) -> None:
+	def __init__(self, fort: Fort = Fort(), hero: Hero = Hero()) -> None:
 		self.fort = fort
 		self.hero = hero
 

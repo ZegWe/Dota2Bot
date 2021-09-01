@@ -72,6 +72,7 @@ class PluginManager(object):
 
 	def add_plugin(self, plugin_name: str, status: bool):
 		if PLUGIN_DICT.get(plugin_name, 0) == 0:
+			logger.error('add plugin failed:'+plugin_name)
 			return
 		for plugin in self.plugins:
 			# print(plugin_name, plugin.get_name())

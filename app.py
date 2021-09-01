@@ -6,6 +6,7 @@ import Config
 from model.db import BaseDB
 from model.logger import logger
 from model.plugmanager import PluginManager
+import plugins
 
 sio = socketio.Client()
 managers : dict[int, PluginManager] = {}
@@ -42,10 +43,12 @@ def init():
 	args = parser.parse_args()
 	Config.Load(args.config)
 	BaseDB.connect()
+	logger.info(str(plugins.PLUGIN_DICT))
 	for group in Config.groups:
 		managers[group] = PluginManager(group)
 		managers[group].add_plugin('DOTA2战绩播报', True)
 		managers[group].add_plugin('DOTA2每日运势', True)
+		managers[group].add_plugin('DOTA2战绩图', True)
 
 if __name__ == "__main__":
 	init()
