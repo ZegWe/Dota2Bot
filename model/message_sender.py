@@ -18,19 +18,10 @@ class MsgSender:
 		self.url: str = url
 		self.qid: int = qid
 		self.to: int = to
-		self._data: dict = {}
-		self._image_data: dict = {}
 
-	def _get_data(self, message: str) -> dict:
-		tmp = self._data
-		tmp["Content"] = message
-		return tmp
-
-	def _get_image_data(self, url: str) -> dict:
-		tmp = self._image_data
-		tmp["PicUrl"] = url
-		return tmp
-
+		self._data : dict = {
+				"ToUserUid": self.to,
+			}
 
 	@classmethod
 	def get_last_time(cls) -> datetime.datetime:
@@ -41,12 +32,24 @@ class MsgSender:
 		cls.__last_time = time
 
 	def send(self, message: str):
-		data = self._get_data(message)
-		self.send_data(data)
+		tmp = self._data.copy()
+		tmp["SendMsgType"] = "TextMsg"
+		tmp["Content"] = message
+		self.send_data(tmp)
 
-	def send_image(self, url: str):
-		data = self._get_image_data(url)
-		self.send_data(data)
+	def send_image_by_url(self, url: str, msg: str = ""):
+		tmp = self._data.copy()
+		tmp["SendMsgType"] = "PicMsg"
+		tmp["PicUrl"] = url
+		tmp["Content"] = msg
+		self.send_data(tmp)
+
+	def send_image_by_base64(self, base64_data: str, msg: str = ""):
+		tmp = self._data.copy()
+		tmp["SendMsgType"] = "PicMsg"
+		tmp["PicBase64Buf"] = base64_data
+		tmp["Content"] = msg
+		self.send_data(tmp)
 
 	def send_data(self, data: dict):
 		delta = datetime.timedelta(seconds=1.1)
@@ -70,33 +73,9 @@ class MsgSender:
 class GroupSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
 		super().__init__(url, qid, to)
-		self._data = {
-				"ToUserUid": self.to,
-				"SendToType": 2,
-				"SendMsgType": "TextMsg",
-				"Content": ""
-			}
-
-		self._image_data = {
-				"ToUserUid": self.to,
-				"SendToType": 2,
-				"SendMsgType": "PicMsg",
-				"PicUrl": ""
-			}
+		self._data["SendToType"] = 2
 
 class FriendSender(MsgSender):
 	def __init__(self, url: str, qid: int, to: int):
 		super().__init__(url, qid, to)
-		self._data = {
-				"ToUserUid": self.to,
-				"SendToType": 1,
-				"SendMsgType": "TextMsg",
-				"Content": ""
-			}
-
-		self._image_data = {
-				"ToUserUid": self.to,
-				"SendToType": 1,
-				"SendMsgType": "PicMsg",
-				"PicUrl": ""
-			}
+		self._data["SendToType"] = 1
