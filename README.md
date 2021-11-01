@@ -6,6 +6,7 @@
 		- [Plugin Manage](#plugin-manage)
 		- [Dota2Watcher](#dota2watcher)
 		- [Dota2Fortune](#dota2fortune)
+		- [Dota2MDI](#dota2mdi)
 	- [Quick start](#quick-start)
 		- [Prepare](#prepare)
 		- [Run](#run)
@@ -30,6 +31,7 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 |-|-|
 |[Dota2Watcher](#dota2watcher)|Dota2战绩监视|
 |[Dota2Fortune](#dota2fortune)|Dota2每日运势|
+|[Dota2MDI](#dota2mdi)|Dota2战绩图|
 
 ### [Plugin Manage](#plugin-manage)
 
@@ -56,6 +58,10 @@ This bot also integrates a plugin manage system, you can develop any plugin you 
 `!今日运势`: Today's fortune of Dota2.
 
 `!幸运英雄`: Today's lucky hero.
+
+### [Dota2MDI](#dota2mdi)
+
+`!战绩图 [match_id]`: return match detail image
 
 ## [Quick start](#quick-start)
 
@@ -100,7 +106,8 @@ Here's an example for `config.json`, you can also see this as [`config.example.j
 	"bot_qq": 1234567890,
 	"groups": [1234567890],
 	"opq_url": "http://127.0.0.1:8080",
-	"debug": false
+	"debug": false,
+	"mdi_url": "http://dota2mdi.zegwe.me"
 }
 ```
 
