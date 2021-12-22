@@ -62,6 +62,7 @@ class Dota2Announcement(Plugin):
         self._announcement = get_announcements(1)[0]
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(self.update, "interval", seconds=60)
+        self.scheduler.start()
         self.commands.append(
             Command(["查看公告"], [int], "index: 查看指定序号的公告", self.show_announcement))
         self.commands.append(
@@ -103,3 +104,7 @@ class Dota2Announcement(Plugin):
             msg += "\n{}. {}".format(offset + i + 1, item.title)
         self.sender.send(msg)
         return
+
+    def shutdown(self):
+        self.scheduler.shutdown()
+        super().shutdown()
