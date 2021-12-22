@@ -1,4 +1,6 @@
+from datetime import tzinfo
 import time
+import pytz
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -35,7 +37,8 @@ class Watcher(Plugin):
         self.running = True
         # self.pool.submit(self.update)
         self.scheduler = BackgroundScheduler()
-        self.scheduler.add_job(self.update_once, 'interval', seconds=300)
+        self.scheduler.add_job(
+            self.update_once, 'interval', seconds=300, timezone=pytz.timezone('Asia/Shanghai'))
         self.scheduler.start()
         self.commands.append(
             Command(['查看监视'], [], '： 查看监视列表', self.show_watch))
