@@ -77,12 +77,12 @@ class Fortune(Plugin):
 		if FromUserId in self.users:
 			tmp_user = self.users[FromUserId]
 			if not tmp_user.hero or tmp_user.hero.upd_date != get_date():
-				tmp = random.sample(Heroes.keys(), 1)[0]
+				tmp = random.choice([*Heroes])
 				sentence = random.choice(heroDict)
 				tmp_user = User(tmp_user.fort, Hero(Heroes[tmp], sentence))
 				self.users[FromUserId] = tmp_user
 		else:
-			tmp = random.sample(Heroes.keys(), 1)[0]
+			tmp = random.choice([*Heroes])
 			sentence = random.choice(heroDict)
 			tmp_user = User(hero=Hero(Heroes[tmp], sentence))
 			self.users[FromUserId] = tmp_user
@@ -94,11 +94,11 @@ class Fortune(Plugin):
 		if FromUserId in self.users:
 			tmp_user = self.users[FromUserId]
 			if not tmp_user.fort or tmp_user.fort.upd_date != get_date():
-				tmp = random.sample(fortuneDict.keys(), 1)[0]
+				tmp = random.choice([*fortuneDict])
 				tmp_user = User(Fort(tmp, random.choice(fortuneDict[tmp])),tmp_user.hero)
 				self.users[FromUserId] = tmp_user
 		else:
-			tmp = random.sample(fortuneDict.keys(), 1)[0]
+			tmp = random.choice([*fortuneDict])
 			tmp_user = User(Fort(tmp, random.choice(fortuneDict[tmp])))
 			self.users[FromUserId] = tmp_user
 

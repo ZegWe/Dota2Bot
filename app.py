@@ -1,4 +1,5 @@
 import argparse
+from math import trunc
 
 import socketio
 
@@ -49,6 +50,7 @@ def init():
 		managers[group].add_plugin('DOTA2战绩播报', True)
 		managers[group].add_plugin('DOTA2每日运势', True)
 		managers[group].add_plugin('DOTA2战绩图', True)
+		managers[group].add_plugin('DOTA2公告', True)
 
 if __name__ == "__main__":
 	init()
