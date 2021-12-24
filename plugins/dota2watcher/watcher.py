@@ -102,7 +102,7 @@ class Watcher(Plugin):
         if len(self.accounts) == 0:
             return
         if self.On():
-            logger.debug('updating...')
+            logger.debug('update watch')
             tmpList = self.pool.map(self.update_account, self.accounts)
             self.accounts = list(tmpList)
             logger.debug(self.result)

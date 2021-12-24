@@ -76,18 +76,19 @@ class Dota2Announcement(Plugin):
         return cls.__name
 
     def update(self):
-        logger.debug("update announcement")
-        announcement = get_announcements(1)[0]
-        if announcement.gid == 0:
-            return
-        if self._announcement.gid != announcement.gid:
-            self._announcement = announcement
-            self.sender.send(str(self._announcement))
-        elif self._announcement.update_time != announcement.update_time:
-            self._announcement = announcement
-            self.sender.send(str(self._announcement))
-        else:
-            pass
+        if self.On():
+            logger.debug("update announcement")
+            announcement = get_announcements(1)[0]
+            if announcement.gid == 0:
+                return
+            if self._announcement.gid != announcement.gid:
+                self._announcement = announcement
+                self.sender.send(str(self._announcement))
+            elif self._announcement.update_time != announcement.update_time:
+                self._announcement = announcement
+                self.sender.send(str(self._announcement))
+            else:
+                pass
 
     def show_announcement(self, index: int, FromUserId: int):
         announcement = get_announcements(1, index-1)[0]
