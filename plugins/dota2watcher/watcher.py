@@ -74,29 +74,6 @@ class Watcher(Plugin):
         logger.debug('account update finish')
         return account
 
-    def update(self):
-        time.sleep(1)
-        logger.debug('Watch Loop started: {}'.format(self.group_id))
-        while self.running:
-            self.result.clear()
-            if len(self.accounts) == 0:
-                time.sleep(5)
-                continue
-            if self.On():
-                logger.debug('updating...')
-                tmpList = self.pool.map(self.update_account, self.accounts)
-                self.accounts = list(tmpList)
-                logger.debug(self.result)
-                for match_id in self.result:
-                    for message in generate_message(match_id, self.result[match_id]):
-                        self.sender.send(message)
-            for _ in range(300):
-                if self.running:
-                    time.sleep(1)
-                else:
-                    break
-        logger.debug('Watching Loop exited: {}'.format(self.group_id))
-
     def update_once(self):
         self.result.clear()
         if len(self.accounts) == 0:

@@ -64,7 +64,7 @@ class Dota2Announcement(Plugin):
         self._announcement = get_announcements(1)[0]
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(
-            self.update, "interval", seconds=60, timezone=pytz.timezone('Asia/Shanghai'))
+            self.update, "interval", seconds=300, timezone=pytz.timezone('Asia/Shanghai'))
         self.scheduler.start()
         self.commands.append(
             Command(["查看公告"], [int], "index: 查看指定序号的公告", self.show_announcement))
