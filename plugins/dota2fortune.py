@@ -5,7 +5,7 @@ import pytz
 from model.command import Command
 from model.message_sender import GroupSender
 from model.plugin import Plugin
-from model.dict import get_hero_list as Heroes
+from model.dict import get_hero_list
 
 fortuneDict: dict[str, list[str]] = {
     '大吉': [
@@ -81,18 +81,19 @@ class Fortune(Plugin):
         return cls.__name
 
     def get_hero(self, FromUserId: int) -> None:
+        hero_list = get_hero_list()
         if FromUserId in self.users:
             tmp_user = self.users[FromUserId]
             if not tmp_user.hero or tmp_user.hero.upd_date != get_date():
-                tmp = random.choice([*Heroes()])
+                tmp = random.choice([*hero_list])
                 sentence = random.choice(heroDict)
                 tmp_user = User(tmp_user.fort, Hero(
-                    Heroes()[tmp].name_sc, sentence))
+                    hero_list[tmp].name_sc, sentence))
                 self.users[FromUserId] = tmp_user
         else:
-            tmp = random.choice([*Heroes()])
+            tmp = random.choice([*hero_list])
             sentence = random.choice(heroDict)
-            tmp_user = User(hero=Hero(Heroes()[tmp].name_sc, sentence))
+            tmp_user = User(hero=Hero(hero_list[tmp].name_sc, sentence))
             self.users[FromUserId] = tmp_user
 
         m = '[ATUSER({})]的今日幸运英雄是{}，{}'.format(

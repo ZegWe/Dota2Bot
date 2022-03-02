@@ -126,8 +126,9 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
     print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
     print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
     print_str += "\n战绩详情: https://www.dotabuff.com/matches/{}".format(match_id)
+    hero_list = get_hero_list()
     for player in players:
-        hero = get_hero_list()[player.hero].name_sc if player.hero in get_hero_list() else '不知道什么鬼'
+        hero = hero_list[player.hero].name_sc if player.hero in hero_list else '不知道什么鬼'
         persona, kda = player.persona, player.kda
         last_hits, denies = player.last_hits, player.denies
         damage = player.damage
