@@ -1,15 +1,13 @@
-from datetime import tzinfo
-import time
-import pytz
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
-from apscheduler.schedulers.background import BackgroundScheduler
 
 import Config
+import pytz
+from apscheduler.schedulers.background import BackgroundScheduler
+from model.account import Account
 from model.command import Command
 from model.logger import logger
 from model.message_sender import GroupSender
-from model.account import Account
 from model.plugin import Plugin
 
 from .DotaDB import DotaDB as DB
