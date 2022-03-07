@@ -1,3 +1,4 @@
+from re import T
 from time import sleep
 from .logger import logger
 
@@ -88,7 +89,9 @@ class Match:
                 self.scores[0] += p.kills
             else:
                 self.scores[1] += p.kills
-            tmp[p.party_id] += 1 if p.party_id != -1 else 0
+            t = tmp.get(p.party_id, 0)
+            t += 1 if p.party_id != -1 else 0
+            tmp[p.party_id] = t
 
         for i, p in enumerate(self.players):
             p.party_size = tmp[p.party_id]
@@ -100,7 +103,7 @@ class Match:
 def get_match_detail(match_id: int, token: str) -> Match:
     url = 'https://api.stratz.com/api/v1/match/{}?jwt={}'.format(
         match_id, token)
-    for i in range(0,4):
+    for i in range(0, 4):
         try:
             logger.debug('getting match detail({})...'.format(i))
             response = requests.get(url)
@@ -108,14 +111,16 @@ def get_match_detail(match_id: int, token: str) -> Match:
             raise DOTA2HTTPError("Requests Error.")
         if response.status_code != 200:
             if response.status_code == 204:
-                logger.warning("Get match detail failed, retrying...\n{}".format(response))
+                logger.warning(
+                    "Get match detail failed, retrying...\n{}".format(response))
                 sleep(60)
                 continue
             raise DOTA2HTTPError(
                 "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
         match = response.json()
+        # logger.debug(match)
         if match == None:
             continue
         return Match(match)
-    
+
     raise DOTA2HTTPError("Failed for too many times")
