@@ -1,3 +1,4 @@
+from time import sleep
 from .logger import logger
 
 import requests
@@ -99,13 +100,18 @@ class Match:
 def get_match_detail(match_id: int, token: str) -> Match:
     url = 'https://api.stratz.com/api/v1/match/{}?jwt={}'.format(
         match_id, token)
-    try:
-        response = requests.get(url)
-    except requests.RequestException:
-        raise DOTA2HTTPError("Requests Error.")
-    if response.status_code != 200:
-        raise DOTA2HTTPError(
-            "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
-    match = response.json()
-    logger.debug('match detail')
-    return Match(match)
+    for _ in range(0,3):
+        try:
+            response = requests.get(url)
+        except requests.RequestException:
+            raise DOTA2HTTPError("Requests Error.")
+        if response.status_code != 200:
+            if response.status_code == 204:
+                sleep(30)
+                continue
+            raise DOTA2HTTPError(
+                "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
+        match = response.json()
+        return Match(match)
+    
+    raise DOTA2HTTPError("Too many times")
