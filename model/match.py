@@ -107,6 +107,7 @@ def get_match_detail(match_id: int, token: str) -> Match:
             raise DOTA2HTTPError("Requests Error.")
         if response.status_code != 200:
             if response.status_code == 204:
+                logger.warning("Get match detail failed, retrying...")
                 sleep(30)
                 continue
             raise DOTA2HTTPError(
@@ -114,4 +115,4 @@ def get_match_detail(match_id: int, token: str) -> Match:
         match = response.json()
         return Match(match)
     
-    raise DOTA2HTTPError("Too many times")
+    raise DOTA2HTTPError("Failed for three times")
