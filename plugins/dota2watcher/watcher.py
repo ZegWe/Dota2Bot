@@ -32,7 +32,7 @@ class Watcher(Plugin):
         self.accounts: list[Account] = self.db.get_accounts()
         logger.debug(self.accounts)
         for account in self.accounts:
-            account = self.update_account(account)
+            account = self.update_account(account, True)
         self.running = True
         # self.pool.submit(self.update)
         self.scheduler = BackgroundScheduler()
@@ -55,7 +55,7 @@ class Watcher(Plugin):
     def get_name(cls):
         return cls.__name
 
-    def update_account(self, account: Account) -> Account:
+    def update_account(self, account: Account,  immediately: bool = False) -> Account:
         logger.debug('Watcher update account')
         try:
             match_id = get_last_match_id_by_short_steamID(
@@ -72,8 +72,9 @@ class Watcher(Plugin):
             else:
                 self.result.update({match_id: [account]})
             self.lock.release()
-            account.last_DOTA2_match_ID = match_id
-            self.db.update_info(account)
+            if immediately:
+                account.last_DOTA2_match_ID = match_id
+                self.db.update_info(account)
         logger.debug('account update finish')
         return account
 
@@ -90,7 +91,7 @@ class Watcher(Plugin):
                 try:
                     match = get_match_detail(match_id, Config.stratz)
                 except Exception as e:
-                    logger.error('Get match detail error: {}'.format(e))
+                    logger.error('Get match detail error: {}'.format(repr(e)))
                     self.sender.send('获取战绩详情失败！')
                     continue
                 for message in generate_message(match, self.result[match_id]):
@@ -103,6 +104,7 @@ class Watcher(Plugin):
                             if score < 10:
                                 score = 10
                             account.score = score
+                            account.last_DOTA2_match_ID = match.match_id
                             self.accounts[i] = account
                             self.db.update_info(account)
 

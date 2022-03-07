@@ -103,7 +103,8 @@ class Match:
 def get_match_detail(match_id: int, token: str) -> Match:
     url = 'https://api.stratz.com/api/v1/match/{}?jwt={}'.format(
         match_id, token)
-    for i in range(0, 4):
+    for i in range(0, 3):
+        sleep(60)
         try:
             logger.debug('getting match detail({})...'.format(i))
             response = requests.get(url)
@@ -112,8 +113,7 @@ def get_match_detail(match_id: int, token: str) -> Match:
         if response.status_code != 200:
             if response.status_code == 204:
                 logger.warning(
-                    "Get match detail failed, retrying...\n{}".format(response))
-                sleep(60)
+                    "Get match detail failed, retrying...{}\n{}".format(i+1, response))
                 continue
             raise DOTA2HTTPError(
                 "Failed to retrieve data: %s. URL: %s" % (response.status_code, url))
