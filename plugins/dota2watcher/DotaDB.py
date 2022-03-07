@@ -7,6 +7,7 @@ class DotaDB(BaseDB):
     基于BaseDB的Dota2战绩数据库，以供Dota2Watcher插件使用
     """
     __name = "Dota2 Player Info DB"
+
     def __init__(self, group_id: int):
         """
         :param group_id: Watcher提供的群号
@@ -18,8 +19,15 @@ class DotaDB(BaseDB):
 		long_steamID INT NOT NULL,
 		nickname CHAR(50) NOT NULL,
 		qqid INT NOT NULL,
-		last_DOTA2_match_ID INT);
+		last_DOTA2_match_ID INT
+        score INT NOT NULL DEFAULT 0);
 		'''.format(group_id))
+        try:
+            self.c.execute('''
+            ALTER TABLE `playerInfo-{}` ADD COLUMN score INT NOT NULL DEFAULT 0
+            '''.format(group_id))
+        except:
+            pass
         self.conn.commit()
 
     @classmethod
@@ -41,23 +49,26 @@ class DotaDB(BaseDB):
                               long_steamID=row[1],
                               nickname=row[2],
                               qqid=row[3],
-                              last_DOTA2_match_ID=row[4])
+                              last_DOTA2_match_ID=row[4],
+                              score=row[5])
             accounts.append(account)
         self.lock.release()
         return accounts
 
-    def update_DOTA2_match_ID(self, short_steamID, last_DOTA2_match_ID):
+    def update_info(self, account : Account):
         self.lock.acquire()
-        self.c.execute("UPDATE `playerInfo-{}` SET last_DOTA2_match_ID='{}' WHERE short_steamID={}"
-                       .format(self.group_id, last_DOTA2_match_ID, short_steamID))
+        self.c.execute("UPDATE `playerInfo-{}` "
+                       "SET last_DOTA2_match_ID='{}', score='{}' "
+                       "WHERE short_steamID={}"
+                       .format(self.group_id, account.last_DOTA2_match_ID, account.score, account.short_steamID))
         self.conn.commit()
         self.lock.release()
 
-    def insert_info(self, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID):
+    def insert_info(self, account: Account):
         self.lock.acquire()
-        self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID) "
-                       "VALUES ({}, {}, {}, '{}', '{}')"
-                       .format(self.group_id, short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID))
+        self.c.execute("INSERT INTO `playerInfo-{}` (short_steamID, long_steamID, qqid, nickname, last_DOTA2_match_ID, score) "
+                       "VALUES ({}, {}, {}, '{}', '{}', '{}')"
+                       .format(self.group_id, account.short_steamID, account.long_steamID, account.qqid, account.nickname, account.last_DOTA2_match_ID, account.score))
         self.conn.commit()
         self.lock.release()
 

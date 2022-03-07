@@ -8,7 +8,7 @@ from model.account import Account
 from model.dict import *
 from model.error import DOTA2HTTPError
 from model.logger import logger
-from model.match import MatchPlayer, get_match_detail
+from model.match import Match, MatchPlayer
 
 from .messages import Messages
 
@@ -67,20 +67,14 @@ def get_last_match_id_by_short_steamID(short_steamID: int) -> int:
 
 # 接收某局比赛的玩家列表, 生成战报
 # 参数为玩家对象列表和比赛ID
-def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
+def generate_message(detail: Match, accounts: list[Account]) -> list[str]:
     logger.debug('generating...')
-    try:
-        detail = get_match_detail(match_id, Config.api_key)
-    except DOTA2HTTPError as e:
-        logger.error(e)
-        return ["DOTA2战报生成失败"]
 
     if detail.mode in [15, 19]:  # 各种活动模式不通报
         return []
     mode = GAME_MODE[detail.mode] if detail.mode in GAME_MODE else '未知'
 
     lobby = LOBBY[detail.typ] if detail.typ in LOBBY else '未知'
-    solo = True if len(accounts) == 1 else False
     # 更新玩家对象的比赛信息
     players: list[MatchPlayer] = []
     for player in detail.players:
@@ -89,6 +83,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
                 player.account = account
                 players.append(player)
                 break
+    party = True if players[0].party_size > 1 else False
     # 队伍信息
     scores = detail.scores
     radiant = players[0].radiant
@@ -116,7 +111,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
     else:
         postive = random.randint(0, 1)
 
-    print_str = random.choice(Messages[solo*4+win*2+postive]).format(print_str)
+    print_str = random.choice(Messages[party*4+win*2+postive]).format(print_str)
 
     start_time = datetime.datetime.fromtimestamp(
         detail.start_time, tz=pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S")
@@ -125,7 +120,7 @@ def generate_message(match_id: int, accounts: list[Account]) -> list[str]:
         detail.duration / 60, detail.duration % 60)
     print_str += "\n游戏模式: [{}/{}]".format(mode, lobby)
     print_str += "\n总比分： {}:{}".format(scores[0], scores[1])
-    print_str += "\n战绩详情: https://www.dotabuff.com/matches/{}".format(match_id)
+    print_str += "\n战绩详情: https://www.dotabuff.com/matches/{}".format(detail.match_id)
     hero_list = get_hero_list()
     for player in players:
         hero = hero_list[player.hero].name_sc if player.hero in hero_list else '不知道什么鬼'

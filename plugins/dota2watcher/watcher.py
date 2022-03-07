@@ -7,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from model.account import Account
 from model.command import Command
 from model.logger import logger
+from model.match import get_match_detail
 from model.message_sender import GroupSender
 from model.plugin import Plugin
 
@@ -44,6 +45,10 @@ class Watcher(Plugin):
             Command(['添加监视'], [str, int, int], '昵称 Steam账号 QQ号： 添加新的监视账号', self.add_watch))
         self.commands.append(
             Command(['移除监视'], [int], '序号： 移除指定的监视账号', self.remove_watch))
+        self.commands.append(
+            Command(['更新分数'], [int, int], "序号 分数： 更新指定账号分数", self.update_score))
+        self.commands.append(
+            Command(['查看分数'], [int], "序号：查看指定账号分数", self.show_score))
         logger.debug('Dota2 Watcher({}) initialized.'.format(group_id))
 
     @classmethod
@@ -67,8 +72,8 @@ class Watcher(Plugin):
             else:
                 self.result.update({match_id: [account]})
             self.lock.release()
-            self.db.update_DOTA2_match_ID(account.short_steamID, match_id)
             account.last_DOTA2_match_ID = match_id
+            self.db.update_info(account)
         logger.debug('account update finish')
         return account
 
@@ -82,8 +87,23 @@ class Watcher(Plugin):
             self.accounts = list(tmpList)
             logger.debug(self.result)
             for match_id in self.result:
-                for message in generate_message(match_id, self.result[match_id]):
+                try:
+                    match = get_match_detail(match_id, Config.stratz)
+                except:
+                    self.sender.send('获取战绩详情失败！')
+                    continue
+                for message in generate_message(match, self.result[match_id]):
                     self.sender.send(message)
+
+                for player in match.players:
+                    for i, account in enumerate(self.accounts):
+                        if player.account_id == account.short_steamID:
+                            score = account.score + player.score_change
+                            if score < 10:
+                                score = 10
+                            account.score = score
+                            self.accounts[i] = account
+                            self.db.update_info(account)
 
     def shutdown(self):
         self.running = False
@@ -91,16 +111,16 @@ class Watcher(Plugin):
         self.pool.shutdown()
         super().shutdown()
 
-    def add_watch(self, nickname: str, shortID: int, qqid: int, user: int):
+    def add_watch(self, nickname: str, shortID: int, qqid: int, score: int, user: int):
         if self.db.is_account_stored(shortID):
             logger.warning('Player already watched.')
             self.sender.send('该账号已经存在，请勿重复添加！')
             return
         longID = steam_id_convert_32_to_64(shortID)
         last_match = get_last_match_id_by_short_steamID(shortID)
-        self.db.insert_info(shortID, longID, qqid, nickname, last_match)
-        self.accounts.append(
-            Account(nickname, qqid, shortID, longID, last_match))
+        account = Account(nickname, qqid, shortID, longID, last_match, score)
+        self.db.insert_info(account)
+        self.accounts.append(account)
         logger.success('Player information added successfully.')
         self.sender.send('添加监视成功！')
 
@@ -129,6 +149,23 @@ class Watcher(Plugin):
                                        account.nickname, account.short_steamID)
         if len(m):
             self.sender.send(m)
+
+    def update_score(self, index: int, score: int, user: int):
+        try:
+            account = self.accounts[index-1]
+            account.score = score
+            self.accounts[index-1] = account
+            self.db.update_info(account)
+        except Exception as e:
+            logger.error("Update score error: {}".format(e))
+            self.sender.send("更新分数失败！")
+        else:
+            logger.success("Update score succeed!")
+            self.sender.send("更新分数成功！")
+
+    def show_score(self, index: int, user: int):
+        account = self.accounts[index-1]
+        self.sender.send("{}目前分数为：{}".format(account.nickname, account.score))
 
 
 def test():
