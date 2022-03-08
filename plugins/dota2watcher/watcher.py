@@ -92,7 +92,7 @@ class Watcher(Plugin):
                     match = get_match_detail(match_id, Config.stratz)
                 except Exception as e:
                     logger.error('Get match detail error: {}'.format(repr(e)))
-                    self.sender.send('获取战绩详情失败！')
+                    # self.sender.send('获取战绩详情失败！')
                     continue
                 for message in generate_message(match, self.result[match_id]):
                     self.sender.send(message)
