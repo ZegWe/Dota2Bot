@@ -48,7 +48,7 @@ class Watcher(Plugin):
         self.commands.append(
             Command(['更新分数'], [int, int], "序号 分数： 更新指定账号分数", self.update_score))
         self.commands.append(
-            Command(['查看分数'], [int], "序号：查看指定账号分数", self.show_score))
+            Command(['查看分数'], [str], "昵称：查看指定账号分数", self.show_score))
         logger.debug('Dota2 Watcher({}) initialized.'.format(group_id))
 
     @classmethod
@@ -166,9 +166,16 @@ class Watcher(Plugin):
             logger.success("Update score succeed!")
             self.sender.send("更新分数成功！")
 
-    def show_score(self, index: int, user: int):
-        account = self.accounts[index-1]
-        self.sender.send("{}目前分数为：{}".format(account.nickname, account.score))
+    def show_score(self, nick: str, user: int):
+        m: list[str] = []
+        for v in self.accounts:
+            if v.nickname == nick:
+                m.append('{}({})当前分数为： {}'.format(v.nickname, v.short_steamID, v.score))
+        s = '\n'.join(m)
+        if s == '':
+            self.sender.send("未找到相关用户")
+        else:
+            self.sender.send(s)
 
 
 def test():
