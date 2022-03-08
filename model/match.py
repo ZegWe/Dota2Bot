@@ -123,4 +123,4 @@ def get_match_detail(match_id: int, token: str) -> Match:
             continue
         return Match(match)
 
-    raise DOTA2HTTPError("Failed for too many times")
+    raise DOTA2HTTPError("Failed for too many times\n{}".format(url))
