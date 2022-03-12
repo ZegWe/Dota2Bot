@@ -138,17 +138,26 @@ class Match:
                     (1 if p.leaver == 0 and (p.radiant == self.radiant_win) else -1)
             self.players[i] = p
 
-def get_detail(id: int) -> Match:
-    trans = RequestsHTTPTransport(url="https://api.stratz.com/graphql?jwt="+Config.stratz)
+def get_match_detail(id: int) -> Match:
+    url = "https://api.stratz.com/graphql?jwt="+Config.stratz
+    trans = RequestsHTTPTransport(url=url)
     client = Client(transport=trans)
+    for i in range(0,3):
+        sleep(60)
+        try:
+            data = client.execute(query, variable_values={'id': id})
+            if data['match'] == None:
+                logger.warning(
+                    "Get match detail failed, retrying...{}\n{}".format(i+1, data))
+                continue
+            return Match(data['match'])
+        except Exception as e:
+            raise(e)
+        
+    raise DOTA2HTTPError("Failed for too many times\n{}".format(url))
 
-    try:
-        data = client.execute(query, variable_values={'id': id})
-        return Match(data['match'])
-    except Exception as e:
-        raise(e)
 
-def get_match_detail(match_id: int, token: str) -> Match:
+def get_detail(match_id: int, token: str) -> Match:
     url = 'https://api.stratz.com/api/v1/match/{}?jwt={}'.format(
         match_id, token)
     for i in range(0, 3):
