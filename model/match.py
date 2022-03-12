@@ -68,7 +68,7 @@ class MatchPlayer:
     damage: int
     party_size: int
     party_id: int
-    leaver: int
+    leaver: bool
     score_change: int
 
     def __init__(self, data: dict) -> None:
@@ -94,7 +94,7 @@ class MatchPlayer:
         self.party_id = data.get('partyId', -1)
         if self.party_id == None:
             self.party_id = -1
-        self.leaver = data['leaverStatus']
+        self.leaver = data['leaverStatus'] != "NONE"
 
         self.account = Account()
 
@@ -135,7 +135,7 @@ class Match:
             p.party_size = tmp[p.party_id]
             if self.typ == "RANKED":
                 p.score_change = (20 if p.party_size > 1 else 30) * \
-                    (1 if p.leaver == 0 and (p.radiant == self.radiant_win) else -1)
+                    (1 if p.leaver and (p.radiant == self.radiant_win) else -1)
             self.players[i] = p
 
 def get_match_detail(id: int) -> Match:
