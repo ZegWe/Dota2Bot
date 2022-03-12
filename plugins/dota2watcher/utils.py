@@ -72,9 +72,11 @@ def generate_message(detail: Match, accounts: list[Account]) -> list[str]:
 
     if detail.mode in [15, 19]:  # 各种活动模式不通报
         return []
-    mode = GAME_MODE[detail.mode] if detail.mode in GAME_MODE else '未知'
-
-    lobby = LOBBY[detail.typ] if detail.typ in LOBBY else '未知'
+    # mode = GAME_MODE[detail.mode] if detail.mode in GAME_MODE else '未知'
+    mode = detail.mode
+    # lobby = LOBBY[detail.typ] if detail.typ in LOBBY else '未知'
+    lobby = detail.typ
+    
     # 更新玩家对象的比赛信息
     players: list[MatchPlayer] = []
     for player in detail.players:

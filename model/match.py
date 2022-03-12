@@ -3,10 +3,46 @@ from time import sleep
 from .logger import logger
 
 import requests
+import Config
 
 from .account import Account
 from .error import DOTA2HTTPError
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
 
+
+query = gql(
+"""
+query getMatch {
+    match(id: 6464397389) {
+        id
+        durationSeconds
+        startDateTime
+        didRadiantWin
+        gameMode
+        lobbyType
+        players {
+            kills
+            deaths
+            assists
+            isRadiant
+            heroId
+            goldPerMinute
+            experiencePerMinute
+            numLastHits
+            numDenies
+            heroDamage
+            partyId
+            leaverStatus
+            steamAccount {
+                id
+                name
+            }
+        }
+    }
+}
+"""
+)
 
 def is_radiant(slot: int) -> bool:
     if slot < 128:
@@ -41,9 +77,9 @@ class MatchPlayer:
         self.radiant = data['isRadiant']
         self.hero = data['heroId']
 
-        self.kills = data['numKills']
-        self.deaths = data['numDeaths']
-        self.assists = data['numAssists']
+        self.kills = data['kills']
+        self.deaths = data['deaths']
+        self.assists = data['assists']
         self.kda = (1. * self.kills + self.assists) / \
             (1 if self.deaths == 0 else self.deaths)
 
@@ -56,6 +92,8 @@ class MatchPlayer:
         self.damage = data['heroDamage']
 
         self.party_id = data.get('partyId', -1)
+        if self.party_id == None:
+            self.party_id = -1
         self.leaver = data['leaverStatus']
 
         self.account = Account()
@@ -65,8 +103,8 @@ class Match:
     match_id: int
     radiant_win: bool
     players: list[MatchPlayer]
-    mode: int
-    typ: int
+    mode: str
+    typ: str
     scores: list[int]
     duration: int
     start_time: int
@@ -95,10 +133,20 @@ class Match:
 
         for i, p in enumerate(self.players):
             p.party_size = tmp[p.party_id]
-            p.score_change = (20 if p.party_size > 1 else 30) * \
-                (1 if p.leaver == 0 and (p.radiant == self.radiant_win) else -1)
+            if self.typ == "RANKED":
+                p.score_change = (20 if p.party_size > 1 else 30) * \
+                    (1 if p.leaver == 0 and (p.radiant == self.radiant_win) else -1)
             self.players[i] = p
 
+def get_detail(id: int) -> Match:
+    trans = RequestsHTTPTransport(url="https://api.stratz.com/graphql?jwt="+Config.stratz)
+    client = Client(transport=trans)
+
+    try:
+        data = client.execute(query)
+        return Match(data['match'])
+    except Exception as e:
+        raise(e)
 
 def get_match_detail(match_id: int, token: str) -> Match:
     url = 'https://api.stratz.com/api/v1/match/{}?jwt={}'.format(
