@@ -13,8 +13,8 @@ from gql.transport.requests import RequestsHTTPTransport
 
 query = gql(
 """
-query getMatch {
-    match(id: 6464397389) {
+query getMatch ($id: Long!){
+    match(id: $id) {
         id
         durationSeconds
         startDateTime
@@ -143,7 +143,7 @@ def get_detail(id: int) -> Match:
     client = Client(transport=trans)
 
     try:
-        data = client.execute(query)
+        data = client.execute(query, variable_values={'id': id})
         return Match(data['match'])
     except Exception as e:
         raise(e)
