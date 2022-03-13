@@ -136,6 +136,8 @@ class Match:
             if self.typ == "RANKED":
                 p.score_change = (20 if p.party_size > 1 else 30) * \
                     (1 if not p.leaver and (p.radiant == self.radiant_win) else -1)
+            else:
+                p.score_change = 0
             self.players[i] = p
 
 def get_match_detail(id: int) -> Match:
