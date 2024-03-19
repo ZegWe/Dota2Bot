@@ -1,3 +1,4 @@
+# THIS PROJECT IS NO LONGER MAINTAINED
 # DOTA2BOT for QQ
 
 - [DOTA2BOT for QQ](#dota2bot-for-qq)
